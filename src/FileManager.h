@@ -14,8 +14,7 @@ public:
 	FileManager(string);
 	~FileManager();
 
-	void readFile();
-    void readAndFilterData(vector<vector<float>>&, vector<float>);
+	void readFile(vector<vector<float>>* desiredOutputs, vector<vector<float>>* inputData);
     string printResults();
 
 private:
@@ -35,47 +34,38 @@ FileManager::~FileManager()
 
 
 //Adapted from: https://www.gormanalysis.com/blog/reading-and-writing-csv-files-with-cpp/
-void FileManager::readFile() 
+void FileManager::readFile(vector<vector<float>>* desiredOutputs, vector<vector<float>>* inputData)
 {
-	string line, columnName, value;
-	ifstream file(fileName);
+	ifstream myFile(fileName);
 
-    if (!file.is_open()) throw runtime_error("Could not open file");
+	if (!myFile.is_open()) throw runtime_error("Could not open file");
 
-    if (file.good())
-    {
-        getline(file, line);
+	string line, columnname;
+	string value;
 
-        stringstream ss(line);
-
-        while (getline(ss, columnName, ',')) {
-            if (columnName == "top genre") {
-                results.push_back({ columnName, std::vector<string> {} });
-            }
-        }
-
-        while (std::getline(file, line))
-        {
-            int colIdx = 0;
-            stringstream ss(line);
-
-            while (getline(ss, value, ',')) {   
-                if (colIdx == 2) {
-                    results[0].second.push_back((value));
-                    break;
-                }
-                if (ss.peek() == ',') ss.ignore();
-                colIdx++;
-            }
-        }
-
-        file.close();
-    }
+	while (getline(myFile, line)) {
+		vector<float> desiredOutput;
+		vector<float> input;
+		stringstream ss(line);
+		int counter = 0;
+		string token = "";
+		while (getline(ss, token, ',')) {
+				float value = stof(token);
+				if (counter >= 5 && counter <= 9) {
+					desiredOutput.push_back(value);
+				}
+				else {
+					input.push_back(value);
+				}
+			if (ss.peek() == ',') ss.ignore();
+			counter++;	
+		}
+		desiredOutputs->push_back(desiredOutput);
+		inputData->push_back(input);
+	}
+	myFile.close();
 }
 
-inline void FileManager::readAndFilterData(vector<vector<float>>&, vector<float>)
-{
-}
 
 string FileManager::printResults()
 {

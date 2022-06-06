@@ -27,6 +27,7 @@ public:
 	void setWeights(vector<float>);
 	float activationFunction(vector<float>);
 	float sigmoidFunction(float);
+	float sigmoidDerivatedFunction(float);
 	float getError(float, float);
 	float calculateErrorForOutputLayer(float, float);
 	float calculateErrorForHiddenLayer(float, vector<float>, vector<vector<float>>, int);
@@ -41,6 +42,9 @@ private:
 
 	vector<Neuron*>* incomingNeurons;
 	vector<Neuron*>* outgoingNeurons;
+	// 0     1
+//vector<vector<float>> weights;   //w13, w14
+								// w23, w24
 	vector<float> weights;
 	string role;
 	float bias;
@@ -174,6 +178,17 @@ inline float Neuron::sigmoidFunction(float sum)
 	return 1 / (1 + exp(-(sum)));
 }
 
+//<summary>
+//Sigmoid function
+//</summary>
+//<param name="sum">Sum of input times weight</param>
+//<returns> Result of sigmoid fuction applied to sum </returns>
+inline float Neuron::sigmoidDerivatedFunction(float output)
+{
+	return output*(1 - output);
+}
+
+
 inline float Neuron::getError(float desiredOutput, float actualOutput)
 {
 	return desiredOutput - actualOutput;
@@ -187,7 +202,7 @@ inline float Neuron::getError(float desiredOutput, float actualOutput)
 //<returns> Error gradient of output </returns>
 inline float Neuron::calculateErrorForOutputLayer(float desiredOutput, float actualOutput)
 {
-	float errorGradient = actualOutput * (1 - actualOutput) * getError(desiredOutput, actualOutput);
+	float errorGradient = sigmoidDerivatedFunction(actualOutput) * getError(desiredOutput, actualOutput);
 	return errorGradient;
 }
 

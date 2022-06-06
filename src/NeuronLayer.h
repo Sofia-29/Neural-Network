@@ -13,6 +13,7 @@ public:
 	NeuronLayer(int, string, vector<float>, float, vector<float>, float);
 	NeuronLayer(int, string, vector<float>, float);
 	NeuronLayer(int, string, int);
+	NeuronLayer(int, string, int, vector<vector<float>>, vector<float>);
 	~NeuronLayer();
 	void connectNeurons(NeuronLayer*);
 	string toString();
@@ -38,6 +39,17 @@ inline NeuronLayer::NeuronLayer(int count, string role, int amountOfEntries)
 	while (count-- > 0)
 	{
 		this->push_back(new Neuron(role, amountOfEntries));
+		neuronId++;
+	}
+}
+
+inline NeuronLayer::NeuronLayer(int count, string role, int amountOfEntries, vector<vector<float>> weights, vector<float> bias)
+{
+	int neuronId = 0;
+	this->reserve(count);
+	for(int index = 0; index < weights.size(); index++)
+	{
+		this->push_back(new Neuron(role, weights[index], bias[index]));
 		neuronId++;
 	}
 }
