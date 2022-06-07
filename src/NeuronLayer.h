@@ -54,15 +54,12 @@ inline NeuronLayer::NeuronLayer(int count, string role, int amountOfEntries, vec
 	}
 }
 
-NeuronLayer::NeuronLayer(int count, string role, vector<float> weights1, float bias1, vector<float> weights2, float bias2)
-{
-	this->reserve(count);
-	this->push_back(new Neuron(role, weights1, bias1));
-	this->push_back(new Neuron(role, weights2, bias2));
-}
 
 NeuronLayer::~NeuronLayer()
 {
+	for (int index = 0; index < this->size(); index++) {
+		delete this->at(index);
+	}
 }
 
 inline void NeuronLayer::connectNeurons(NeuronLayer* neuronLayer)
@@ -77,12 +74,3 @@ inline void NeuronLayer::connectNeurons(NeuronLayer* neuronLayer)
 	}
 }
 
-string NeuronLayer::toString()
-{
-	ostringstream os;
-	os << "Capa de neuronas: " << this->front()->getRole() << endl;
-	for (int index = 0; index < this->size(); index++) {
-		os << this->at(index)->toString();
-	}
-	return os.str();
-}

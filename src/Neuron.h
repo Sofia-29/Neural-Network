@@ -15,16 +15,16 @@ public:
 	Neuron(string, int);
 	~Neuron();
 
-	void deleteNeurons(vector<Neuron*>*);
 	unsigned int gId();
 	string getRole();
 	vector<Neuron*>* getNextLayer();
 	vector<Neuron*>* getPreviousLayer();
 	vector<float> getWeights();
+	void setWeights(vector<float>);
+	void setBias(float);
 	void addOutgoingNeuron(Neuron*);
 	void addIncomingNeuron(Neuron*);
 	void initialisation(int);
-	void setWeights(vector<float>);
 	float activationFunction(vector<float>);
 	float sigmoidFunction(float);
 	float sigmoidDerivatedFunction(float);
@@ -42,9 +42,7 @@ private:
 
 	vector<Neuron*>* incomingNeurons;
 	vector<Neuron*>* outgoingNeurons;
-	// 0     1
-//vector<vector<float>> weights;   //w13, w14
-								// w23, w24
+
 	vector<float> weights;
 	string role;
 	float bias;
@@ -85,13 +83,8 @@ inline Neuron::Neuron(string role, int numberOfInputs)
 
 Neuron::~Neuron()
 {
-	deleteNeurons(incomingNeurons);
-	deleteNeurons(outgoingNeurons);
-}
-
-inline void Neuron::deleteNeurons(vector<Neuron*>* neurons)
-{
-	neurons->erase(neurons->begin(), neurons->end());
+	delete incomingNeurons;
+	delete outgoingNeurons;
 }
 
 unsigned int Neuron::gId()
@@ -120,6 +113,15 @@ inline vector<Neuron*>* Neuron::getPreviousLayer()
 	return incomingNeurons;
 }
 
+inline void Neuron::setWeights(vector<float> newWeights)
+{
+	this->weights = newWeights;
+}
+
+inline void Neuron::setBias(float bias)
+{
+	this->bias = bias;
+}
 
 inline void Neuron::addOutgoingNeuron(Neuron* neuron)
 {
@@ -142,12 +144,6 @@ inline void Neuron::initialisation(int numberOfInputs)
 		weights.emplace_back(value);
 	}
 }
-
-inline void Neuron::setWeights(vector<float> newWeights)
-{
-	this->weights = newWeights;
-}
-
 
 //<summary>
 //Activate the back-propagation neural network by applying inputs
@@ -248,12 +244,10 @@ inline vector<float> Neuron::updateWeight(float learningRate, float errorGradien
 inline string Neuron::toString()
 {
 	ostringstream os;
-	os << "Id: " << this->id << endl;
 	for (int index = 0; index < weights.size(); index++) {
-		os << weights[index] << " ";
+		os << weights[index] << ",";
 	}
-	os << endl;
-	os << "Bias: " << this->bias << endl;
+	os << this->bias;
 	return os.str();
 }
 
