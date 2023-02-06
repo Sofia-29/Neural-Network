@@ -19,12 +19,12 @@ public:
 
 NeuronLayer::NeuronLayer() {}
 
-NeuronLayer::NeuronLayer(int count, string role, int amountOfEntries)
+NeuronLayer::NeuronLayer(int amountOfLayerNeurons, string role, int amountOfPreviousLayerNeurons)
 {
-	this->reserve(count);
-	while (count-- > 0)
+	this->reserve(amountOfLayerNeurons);
+	while (amountOfLayerNeurons-- > 0)
 	{
-		this->push_back(new Neuron(role, amountOfEntries));
+		this->push_back(new Neuron(role, amountOfPreviousLayerNeurons));
 	}
 }
 
@@ -38,12 +38,12 @@ NeuronLayer::~NeuronLayer()
 
 inline void NeuronLayer::connectNeurons(NeuronLayer *neuronLayer)
 {
-	for (int index1 = 0; index1 < this->size(); index1++)
+	for (int outgoingNeuronIndex = 0; outgoingNeuronIndex < this->size(); outgoingNeuronIndex++)
 	{
-		for (int index2 = 0; index2 < neuronLayer->size(); index2++)
+		for (int incomingNeuronIndex = 0; incomingNeuronIndex < neuronLayer->size(); incomingNeuronIndex++)
 		{
-			this->at(index1)->addOutgoingNeuron(neuronLayer->at(index2));
-			neuronLayer->at(index2)->addIncomingNeuron(this->at(index1));
+			this->at(outgoingNeuronIndex)->addOutgoingNeuron(neuronLayer->at(incomingNeuronIndex));
+			neuronLayer->at(incomingNeuronIndex)->addIncomingNeuron(this->at(outgoingNeuronIndex));
 		}
 	}
 }

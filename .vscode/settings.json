@@ -6,6 +6,12 @@
         "type_traits": "cpp",
         "xstring": "cpp",
         "xutility": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "iostream": "cpp",
+        "algorithm": "cpp",
+        "chrono": "cpp",
+        "ratio": "cpp",
+        "utility": "cpp",
+        "ostream": "cpp"
     }
 }

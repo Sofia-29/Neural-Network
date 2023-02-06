@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 #include <random>
-#include <Functions.h>
+#include "Functions.h"
 
 using namespace std;
 
@@ -25,13 +25,7 @@ public:
 	void addIncomingNeuron(Neuron*);
 	void addOutgoingNeuron(Neuron*);
 	float activationFunction(vector<float>);
-	vector<float> updateWeight(float, float, vector<float>);
-
-	// float sigmoidFunction(float);
-	// float sigmoidDerivatedFunction(float);
-	// float getError(float, float);
-	// float calculateErrorForOutputLayer(float, float);
-	// float calculateErrorForHiddenLayer(float, vector<float>, vector<vector<float>>, int);
+	vector<float> weightsCorrection(float, float, vector<float>);
 
 	Neuron* begin() { return this; };
 	Neuron* end() { return this + 1; };
@@ -129,7 +123,7 @@ float Neuron::activationFunction(vector<float> input)
 	return this->functions.sigmoidFunction(sum);
 }
 
-vector<float> Neuron::updateWeight(float learningRate, float errorGradient, vector<float> input)
+vector<float> Neuron::weightsCorrection(float learningRate, float errorGradient, vector<float> input)
 {
 	vector<float> newWeights;
 	for (int index1 = 0; index1 < weights.size(); index1++)
