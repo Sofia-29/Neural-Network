@@ -5,6 +5,7 @@
 #include "Neuron.h"
 #include "NeuronLayer.h"
 #include "Functions.h"
+#include <chrono>
 
 using namespace std;
 
@@ -75,19 +76,36 @@ void Algorithm::startAlgorithm(int numberOfInputsNeurons, int numberOfOutputNeur
 							   vector<vector<float>> inputs, vector<vector<float>> desiredOutputs)
 {
 	int dataSize = inputs.size();
-	//int numberOfHiddenNeurons = numberOfInputsNeurons * 2 + 1;
+	// int numberOfHiddenNeurons = numberOfInputsNeurons * 2 + 1;
 	int numberOfHiddenNeurons = 2;
 	int iterations = 0;
+	std::chrono::time_point<std::chrono::system_clock> instanteInicial, instanteFinal;
+			
+	vector<float> w1 = {0.5, 0.4};
+	vector<float> w2 = {0.9, 1.0};
+	vector<float> biasn1n2 = {0.8, -0.1};
+	vector<float> biasn3n4 = {0.3};
+
+	vector<vector<float>> wn1;
+	wn1.push_back(w1);
+	wn1.push_back(w2);
+
+	vector<float> w3 = {-1.2, 1.1};
+
+	vector<vector<float>> wn2;
+	wn2.push_back(w3);
+
 	// Fixed number of layers
 	NeuronLayer *inputLayer = new NeuronLayer(numberOfInputsNeurons, "inputLayer", 0);
-	NeuronLayer *hiddenLayer = new NeuronLayer(numberOfHiddenNeurons, "hiddenLayer", numberOfInputsNeurons);
-	NeuronLayer *outputLayer = new NeuronLayer(numberOfOutputNeurons, "outputLayer", numberOfHiddenNeurons);
+	NeuronLayer *hiddenLayer = new NeuronLayer(numberOfHiddenNeurons, "hiddenLayer", numberOfInputsNeurons, wn1, biasn1n2);
+	NeuronLayer *outputLayer = new NeuronLayer(numberOfOutputNeurons, "outputLayer", numberOfHiddenNeurons, wn2, biasn3n4);
 
-	vector<vector<float>> *weights = new vector<vector<float>>();
+	// NeuronLayer *hiddenLayer = new NeuronLayer(numberOfHiddenNeurons, "hiddenLayer", numberOfInputsNeurons);
+	// NeuronLayer *outputLayer = new NeuronLayer(numberOfOutputNeurons, "outputLayer", numberOfHiddenNeurons);
 
 	inputLayer->connectNeurons(hiddenLayer);
 	hiddenLayer->connectNeurons(outputLayer);
-
+	instanteInicial = std::chrono::system_clock::now();
 	do
 	{
 		sumOfSquaredErrors = 0.0;
@@ -99,16 +117,15 @@ void Algorithm::startAlgorithm(int numberOfInputsNeurons, int numberOfOutputNeur
 			this->backpropagation(outputLayer, desiredOutputs[indexData]);
 		}
 		iterations++;
-
 		cout << "Sum of squared errors: " << sumOfSquaredErrors << endl;
 		cout << "Number of iterations: " << iterations << endl;
-		cout << endl;
-	} while (sumOfSquaredErrors > 0.001);
-
+	} while (sumOfSquaredErrors > 0.001 );
+	instanteFinal = std::chrono::system_clock::now();
+	std::chrono::duration<double> segundos = instanteFinal - instanteInicial;
+	cout << "SECONDS: " << segundos.count() << endl;
 	delete inputLayer;
 	delete hiddenLayer;
 	delete outputLayer;
-	delete weights;
 }
 
 void Algorithm::feedForward(vector<float> layerInput, vector<Neuron *> *neuronLayer)
@@ -155,17 +172,17 @@ void Algorithm::backpropagation(vector<Neuron *> *outputLayer, vector<float> des
 		this->layerInputs->pop_back();
 		this->actualOutputs->pop_back();
 		neuronLayer = neuronLayer->at(0)->getPreviousLayer();
-		previousLayerErrors = layerErrors;
-		previousWeights = layerWeights;
+		this->previousLayerErrors = layerErrors;
+		this->previousWeights = layerWeights;
 	}
 }
 
 void Algorithm::neuronLayerWeightCorrection(vector<Neuron *> *neuronLayer, vector<float> desiredOutput,
-											vector<vector<float>> &layerWeights, vector<float> &layerErrors)
+											vector<vector<float>>& layerWeights, vector<float>& layerErrors)
 {
 	int size = neuronLayer->size();
-	vector<float> output = this->actualOutputs->back();
 	string neuronLayerRole = neuronLayer->at(0)->getRole();
+	vector<float> output = this->actualOutputs->back();
 	vector<float> input = this->layerInputs->back();
 	for (int neuronIndex = 0; neuronIndex < size; neuronIndex++)
 	{

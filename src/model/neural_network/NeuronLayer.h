@@ -12,6 +12,7 @@ class NeuronLayer : public vector<Neuron *>
 public:
 	NeuronLayer();
 	NeuronLayer(int, string, int);
+	NeuronLayer(int, string, int, vector<vector<float>>, vector<float>);
 	~NeuronLayer();
 	void connectNeurons(NeuronLayer *);
 	string toString();
@@ -25,6 +26,16 @@ NeuronLayer::NeuronLayer(int amountOfLayerNeurons, string role, int amountOfPrev
 	while (amountOfLayerNeurons-- > 0)
 	{
 		this->push_back(new Neuron(role, amountOfPreviousLayerNeurons));
+	}
+}
+
+NeuronLayer::NeuronLayer(int amountOfLayerNeurons, string role, int amountOfPreviousLayerNeurons,
+						 vector<vector<float>> weights, vector<float> bias)
+{
+	this->reserve(amountOfLayerNeurons);
+	for(int index = 0; index < amountOfLayerNeurons; index++)
+	{
+		this->push_back(new Neuron(role, amountOfPreviousLayerNeurons, weights.at(index), bias.at(index)));
 	}
 }
 

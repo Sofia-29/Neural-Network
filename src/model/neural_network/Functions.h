@@ -45,12 +45,11 @@ inline float Functions::calculateErrorForOutputLayer(float desiredOutput, float 
 float Functions::calculateErrorForHiddenLayer(float actualOutput, vector<float> errorGradient,
 											  vector<vector<float>> previousWeight, int connection)
 {
+	
 	float errorGradientHiddenLayer = actualOutput * (1 - actualOutput);
-	// float sum = 0.0;
 	for (int index = 0; index < errorGradient.size(); index++)
 	{
 		errorGradientHiddenLayer *= previousWeight[index][connection] * errorGradient[index];
 	}
-	// errorGradientHiddenLayer *= sum;
 	return errorGradientHiddenLayer;
 }

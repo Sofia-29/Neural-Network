@@ -11,6 +11,7 @@ class Neuron
 {
 public:
 	Neuron(string, int);
+	Neuron(string, int, vector<float>, float);
 	~Neuron();
 
 	void initialization(int);
@@ -48,6 +49,15 @@ Neuron::Neuron(string role, int numberOfInputs)
 	this->incomingNeurons = new vector<Neuron*>();
 	this->outgoingNeurons = new vector<Neuron*>();
 	this->initialization(numberOfInputs);
+}
+
+Neuron::Neuron(string role, int numberOfInputs, vector<float> weights, float bias)
+{
+	this->role = role;
+	this->incomingNeurons = new vector<Neuron*>();
+	this->outgoingNeurons = new vector<Neuron*>();
+	this->weights = weights;
+	this->bias = bias;
 }
 
 Neuron::~Neuron()
@@ -118,7 +128,6 @@ float Neuron::activationFunction(vector<float> input)
 	{
 		sum += input[index] * this->weights[index];
 	}
-
 	sum -= bias;
 	return this->functions.sigmoidFunction(sum);
 }
@@ -143,6 +152,6 @@ string Neuron::toString()
 	{
 		os << weights[index] << ",";
 	}
-	os << this->bias;
+	os << endl << "Bias: " <<  this->bias;
 	return os.str();
 }

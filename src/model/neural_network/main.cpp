@@ -1,36 +1,25 @@
 #include <iostream>
-#include <vector>
 #include "Algorithm.h"
-
-using namespace std;
-
 
 int main()
 {
-	Algorithm algorithm(0.5, 0.001);
-	
-	vector<float> inputs1= {0, 0};
-	vector<float> inputs2 = {0, 1};
-	vector<float> inputs3 = {1, 0};
-	vector<float> inputs4 = {1, 1};
+	Algorithm algorithm(0.5, 0.1);
 
-	vector<vector<float>> inputs;
-	inputs.push_back(inputs1);
-	inputs.push_back(inputs2);
-	inputs.push_back(inputs3);
-	inputs.push_back(inputs4);
+	vector<float> in1 = {1, 1};
+	vector<float> in2 = {1, 0};
+	vector<float> in3 = {0, 1};
+	vector<float> in4 = {0, 0};
 
-	vector<float> desiredOutput1 = {0};
-	vector<float> desiredOutput2 = {1};
-	vector<float> desiredOutput3 = {1};
-	vector<float> desiredOutput4 = {0};
+	vector<vector<float>> inputs = {in1, in2, in3, in4};
 
-	vector<vector<float>> desiredOutput;
-	desiredOutput.push_back(desiredOutput1);
-	desiredOutput.push_back(desiredOutput2);
-	desiredOutput.push_back(desiredOutput3);
-	desiredOutput.push_back(desiredOutput4);
-	algorithm.startAlgorithm(2, 1, inputs, desiredOutput);
+	vector<float> ds1 = {0};
+	vector<float> ds2 = {1};
+	vector<float> ds3 = {1};
+	vector<float> ds4 = {0};
+
+	vector<vector<float>> desiredOutputs = {ds1, ds2, ds3, ds4};
+
+	algorithm.startAlgorithm(2, 1, inputs, desiredOutputs);
 
 	return 0;
 }
