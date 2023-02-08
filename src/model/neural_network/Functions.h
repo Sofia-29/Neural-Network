@@ -13,7 +13,7 @@ public:
 	float sigmoidFunction(float);
 	float sigmoidDerivatedFunction(float);
 	float getError(float, float);
-	float calculateErrorForOutputLayer(float, float);
+	float calculateErrorForOutputLayer(float, float, float);
 	float calculateErrorForHiddenLayer(float, vector<float>, vector<vector<float>>, int);
 };
 
@@ -31,25 +31,26 @@ inline float Functions::sigmoidDerivatedFunction(float output)
 	return output * (1 - output);
 }
 
-inline float Functions::getError(float desiredOutput, float actualOutput)
+inline float Functions::getError(float desiredOutput, float predictedOutput)
 {
-	return desiredOutput - actualOutput;
+	return desiredOutput - predictedOutput;
 }
 
-inline float Functions::calculateErrorForOutputLayer(float desiredOutput, float actualOutput)
+inline float Functions::calculateErrorForOutputLayer(float desiredOutput, float predictedOutput, float error)
 {
-	float errorGradient = sigmoidDerivatedFunction(actualOutput) * getError(desiredOutput, actualOutput);
+	float errorGradient = sigmoidDerivatedFunction(predictedOutput) * error;
 	return errorGradient;
 }
 
-float Functions::calculateErrorForHiddenLayer(float actualOutput, vector<float> errorGradient,
+float Functions::calculateErrorForHiddenLayer(float predictedOutput, vector<float> errorGradient,
 											  vector<vector<float>> previousWeight, int connection)
 {
-	
-	float errorGradientHiddenLayer = actualOutput * (1 - actualOutput);
+	float errorGradientHiddenLayer = predictedOutput * (1 - predictedOutput);
+	float sum = 0.0;
 	for (int index = 0; index < errorGradient.size(); index++)
 	{
-		errorGradientHiddenLayer *= previousWeight[index][connection] * errorGradient[index];
+		sum += previousWeight[index][connection] * errorGradient[index];
 	}
+	errorGradientHiddenLayer *= sum;
 	return errorGradientHiddenLayer;
 }
