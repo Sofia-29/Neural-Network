@@ -3,20 +3,20 @@
 
 #include "Algorithm.h"
 
-extern "C" void runDataTraining(int, int,
-                                float **, float **, int);
+extern "C" void runDataTraining(float, float, int, int,
+                                float**, float**, int);
 
-void runDataTraining(int numberOfInputsNeurons, int numberOfOutputNeurons,
-                     float **inputs, float **desiredOutputs, int size)
+void runDataTraining(float threshold, float learningRate, int numberOfInputsNeurons, int numberOfOutputNeurons,
+                                float** inputs, float** desiredOutputs, int size)
 {
 
-    float threshold = 0.5;
-    float learningRate = 0.1;
+    // float threshold = 0.5;
+    // float learningRate = 0.1 
     Algorithm algorithm(threshold, learningRate);
 
     vector<vector<float>> vec;
     for (int i = 0; i < size; i++)
-    {
+    {   
         vector<float> vecAux(numberOfInputsNeurons);
         for (int j = 0; j < numberOfInputsNeurons; j++)
         {
@@ -27,7 +27,7 @@ void runDataTraining(int numberOfInputsNeurons, int numberOfOutputNeurons,
 
     vector<vector<float>> vecDO;
     for (int i = 0; i < size; i++)
-    {
+    {   
         vector<float> vecAux(numberOfOutputNeurons);
         for (int j = 0; j < 1; j++)
         {
