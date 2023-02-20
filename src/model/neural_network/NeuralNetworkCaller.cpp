@@ -12,9 +12,6 @@ void printVector(vector<vector<float>>);
 void runDataTraining(float threshold, float learningRate, int numberOfInputsNeurons, int numberOfOutputNeurons,
                      float **inputsPointer, float **desiredOutputsPointer, int size)
 {
-
-    // float threshold = 0.5;
-    // float learningRate = 0.1
     Algorithm algorithm(threshold, learningRate);
 
     vector<vector<float>> inputs(size);

@@ -1,7 +1,7 @@
 cd src
 cd model
 
-archivo="neuralNetworkCaller"  # Reemplaza esto con la ruta y el nombre del archivo que quieras verificar
+archivo="neuralNetworkCaller"
 
 if test -f "$archivo"; then
   rm "$archivo" 

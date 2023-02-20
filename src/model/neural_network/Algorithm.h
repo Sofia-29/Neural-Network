@@ -34,10 +34,11 @@ private:
 	int correct_predictions;
 	int outputLayerErrors; 
 
+	float sumOfSquaredErrors;
+
 	Functions *functions;
 	vector<vector<float>> *actualOutputs;
 	vector<vector<float>> *layerInputs;
-	vector<float> *trainingErrors;
 
 	vector<float> previousLayerErrors;
 	vector<vector<float>> previousWeights;
@@ -52,7 +53,6 @@ Algorithm::Algorithm()
 	functions = new Functions();
 	actualOutputs = new vector<vector<float>>();
 	layerInputs = new vector<vector<float>>();
-	trainingErrors = new vector<float>();
 	
 }
 
@@ -66,7 +66,6 @@ Algorithm::Algorithm(float threshold, float learningRate)
 	functions = new Functions();
 	actualOutputs = new vector<vector<float>>();
 	layerInputs = new vector<vector<float>>();
-	trainingErrors = new vector<float>();
 }
 
 Algorithm::~Algorithm()
@@ -74,7 +73,6 @@ Algorithm::~Algorithm()
 	delete this->functions;
 	delete this->actualOutputs;
 	delete this->layerInputs;
-	delete this->trainingErrors;
 }
 
 void Algorithm::startAlgorithm(int numberOfInputsNeurons, int numberOfOutputNeurons,
@@ -116,6 +114,7 @@ void Algorithm::startAlgorithm(int numberOfInputsNeurons, int numberOfOutputNeur
 	instanteInicial = std::chrono::system_clock::now();
 	do
 	{
+		sumOfSquaredErrors = 0.0;
 		correct_predictions = 0;
 		accuracy = 0;
 		vector<float> layerInput;
@@ -125,16 +124,24 @@ void Algorithm::startAlgorithm(int numberOfInputsNeurons, int numberOfOutputNeur
 			this->feedForward(layerInput, hiddenLayer);
 			this->backpropagation(outputLayer, desiredOutputs[indexData]);
 		}
+
+		this->actualOutputs->clear();
+		this->layerInputs->clear();
+		this->previousLayerErrors.clear();
+		this->previousWeights.clear();
+		
 		iterations++;
 		accuracy = (float)correct_predictions / (float)dataSize;
-		cout << "Correct predictions: " << correct_predictions << endl;
-		cout << "Accuracy: " << accuracy << endl; 
-	} while ( accuracy < 0.80 );
+	//	cout << "Correct predictions: " << correct_predictions << endl;
+	//	cout << "Accuracy: " << accuracy << endl; 
+	//} while ( accuracy < 0.80 );
+	} while(sumOfSquaredErrors > 0.001);
 
 	instanteFinal = std::chrono::system_clock::now();
 	std::chrono::duration<double> segundos = instanteFinal - instanteInicial;
 	cout << "SECONDS: " << segundos.count() << endl;
-	cout << "Correct predictions: " << correct_predictions << endl;
+	cout << "SEE: " << sumOfSquaredErrors << endl; 
+	//cout << "Correct predictions: " << correct_predictions << endl;
 	cout << "Number of iterations: " << iterations << endl;
 	delete inputLayer;
 	delete hiddenLayer;
@@ -176,15 +183,11 @@ void Algorithm::backpropagation(vector<Neuron *> *outputLayer, vector<float> des
 	vector<float> previousLayerErrors;
 	vector<vector<float>> previousWeights;
 	this->outputLayerErrors = 0;
-	// index = 3 -> output layer, index = 2 -> hidden layer, index = 1 -> input layer.
 	// Cycle to travers all layers from last one to first one.
-	for (int index = 3; index > 1; index--)
-	{
+	while(neuronLayer->at(0)->getRole() != "inputLayer"){
 		vector<vector<float>> layerWeights;
 		vector<float> layerErrors;
 		this->neuronLayerWeightCorrection(neuronLayer, desiredOutput, layerWeights, layerErrors);
-		this->layerInputs->pop_back();
-		this->actualOutputs->pop_back();
 		neuronLayer = neuronLayer->at(0)->getPreviousLayer();
 		this->previousLayerErrors = layerErrors;
 		this->previousWeights = layerWeights;
@@ -211,7 +214,8 @@ void Algorithm::neuronLayerWeightCorrection(vector<Neuron *> *neuronLayer, vecto
 		neuron->setWeights(newWeights);
 		layerErrors.push_back(errorGradient);
 	}
-
+	this->layerInputs->erase(this->layerInputs->begin() + this->layerInputs->size() - 1);
+	this->actualOutputs->erase(this->actualOutputs->begin() + this->actualOutputs->size() - 1);
 }
 
 float Algorithm::getNeuronErrorGradient(string neuronLayerRole, vector<float> desiredOutput,
@@ -221,6 +225,7 @@ float Algorithm::getNeuronErrorGradient(string neuronLayerRole, vector<float> de
 	if (neuronLayerRole == "outputLayer")
 	{
 		float error = this->functions->getError(desiredOutput[neuronIndex], output[neuronIndex]);
+		sumOfSquaredErrors += pow(error, 2);
 		errorGradient = this->functions->calculateErrorForOutputLayer(desiredOutput[neuronIndex], output[neuronIndex], error);
 		int interpretedError =  pow(this->functions->getError(desiredOutput[neuronIndex], this->interpretOutput(output[neuronIndex])), 2);
 		this->outputLayerErrors += interpretedError;

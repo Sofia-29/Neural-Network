@@ -3,7 +3,7 @@ import pandas as pd
 
 neural_network_caller = ctypes.CDLL('./neuralNetworkCaller.so')
 threshold = 0.5
-learning_rate = 0.5
+learning_rate = 0.5;
 
 def read_csv_file(name : str) -> pd.DataFrame:
     dataframe = pd.read_csv(name, header=None, sep=',')
@@ -48,8 +48,11 @@ def train_dataset(x_train_dataset: pd.DataFrame, y_train_dataset: pd.DataFrame) 
 
 
 def main():
-    inputs = read_csv_file('SpotifyTrainingInputs.csv')
-    desired_outputs = read_csv_file('SpotifyTrainingDesiredOutputs.csv')
+    # inputs = read_csv_file('SpotifyTrainingInputs.csv')
+    # desired_outputs = read_csv_file('SpotifyTrainingDesiredOutputs.csv')
+
+    inputs = read_csv_file('XOR_operation_inputs.csv')
+    desired_outputs = read_csv_file('XOR_operation_desired_outputs.csv')
 
     train_dataset(inputs, desired_outputs)
     return
