@@ -6,35 +6,44 @@
 extern "C" void runDataTraining(float, float, int, int,
                                 float**, float**, int);
 
+void convertToSTLVector(vector<vector<float>>&, float**, int);
+void printVector(vector<vector<float>>);
+
 void runDataTraining(float threshold, float learningRate, int numberOfInputsNeurons, int numberOfOutputNeurons,
-                                float** inputs, float** desiredOutputs, int size)
+                     float **inputsPointer, float **desiredOutputsPointer, int size)
 {
 
     // float threshold = 0.5;
-    // float learningRate = 0.1 
+    // float learningRate = 0.1
     Algorithm algorithm(threshold, learningRate);
 
-    vector<vector<float>> vec;
-    for (int i = 0; i < size; i++)
-    {   
-        vector<float> vecAux(numberOfInputsNeurons);
-        for (int j = 0; j < numberOfInputsNeurons; j++)
-        {
-            vecAux[j] = inputs[i][j];
+    vector<vector<float>> inputs(size);
+    convertToSTLVector(inputs, inputsPointer, numberOfInputsNeurons);
+
+    vector<vector<float>> desiredOutputs(size);
+    convertToSTLVector(desiredOutputs, desiredOutputsPointer, numberOfOutputNeurons);
+
+    algorithm.startAlgorithm(numberOfInputsNeurons, numberOfOutputNeurons, inputs, desiredOutputs);
+}
+
+void convertToSTLVector(vector<vector<float>> &stlVector, float **pointerVector, int size)
+{
+    for(int rowIndex = 0; rowIndex < stlVector.size(); rowIndex++){
+        vector<float> rowVector(size); 
+        for(int columnIndex = 0; columnIndex < size; columnIndex++){
+            rowVector[columnIndex] = pointerVector[rowIndex][columnIndex];
         }
-        vec.push_back(vecAux);
+        stlVector[rowIndex] = rowVector;
+    }
+}
+
+void printVector(vector<vector<float>> vector){
+
+    for(int rowIndex = 0; rowIndex < vector.size(); rowIndex++){
+        for(int columnIndex = 0; columnIndex < vector[rowIndex].size(); columnIndex++){
+            cout << " " << vector[rowIndex][columnIndex];
+        }
+        cout << endl; 
     }
 
-    vector<vector<float>> vecDO;
-    for (int i = 0; i < size; i++)
-    {   
-        vector<float> vecAux(numberOfOutputNeurons);
-        for (int j = 0; j < 1; j++)
-        {
-            vecAux[j] = desiredOutputs[i][j];
-        }
-        vecDO.push_back(vecAux);
-    }
-
-    algorithm.startAlgorithm(numberOfInputsNeurons, numberOfOutputNeurons, vec, vecDO);
 }

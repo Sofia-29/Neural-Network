@@ -1,6 +1,12 @@
 cd src
 cd model
+
+archivo="neuralNetworkCaller"  # Reemplaza esto con la ruta y el nombre del archivo que quieras verificar
+
+if test -f "$archivo"; then
+  rm "$archivo" 
+fi
+
 g++ -shared -o data_processing/neuralNetworkCaller.so -fPIC neural_network/NeuralNetworkCaller.cpp
 cd data_processing
-ls
 python3 data_processing.py

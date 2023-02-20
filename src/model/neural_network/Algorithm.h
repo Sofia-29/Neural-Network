@@ -2,6 +2,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <math.h>
+
 #include "Neuron.h"
 #include "NeuronLayer.h"
 #include "Functions.h"
@@ -29,7 +31,8 @@ public:
 private:
 	float threshold;
 	float learningRate;
-	float sumOfSquaredErrors;
+	int correct_predictions;
+	int outputLayerErrors; 
 
 	Functions *functions;
 	vector<vector<float>> *actualOutputs;
@@ -44,19 +47,21 @@ Algorithm::Algorithm()
 {
 	threshold = 0.0;
 	learningRate = 0.0;
-	sumOfSquaredErrors = 0.0;
-
+	correct_predictions = 0;
+	outputLayerErrors = 0;
 	functions = new Functions();
 	actualOutputs = new vector<vector<float>>();
 	layerInputs = new vector<vector<float>>();
 	trainingErrors = new vector<float>();
+	
 }
 
 Algorithm::Algorithm(float threshold, float learningRate)
 {
 	this->threshold = threshold;
 	this->learningRate = learningRate;
-	sumOfSquaredErrors = 0.0;
+	correct_predictions = 0;
+	outputLayerErrors = 0;
 
 	functions = new Functions();
 	actualOutputs = new vector<vector<float>>();
@@ -76,55 +81,60 @@ void Algorithm::startAlgorithm(int numberOfInputsNeurons, int numberOfOutputNeur
 							   vector<vector<float>> inputs, vector<vector<float>> desiredOutputs)
 {
 	int dataSize = inputs.size();
-//	int numberOfHiddenNeurons = numberOfInputsNeurons * 2 + 1;
+	//	int numberOfHiddenNeurons = numberOfInputsNeurons * 2 + 1;
 
-	int numberOfHiddenNeurons = 2;
+	int numberOfHiddenNeurons = numberOfInputsNeurons;
 	int iterations = 0;
+	float accuracy = 0.0; 
 	std::chrono::time_point<std::chrono::system_clock> instanteInicial, instanteFinal;
 
-	vector<float> w1 = {0.5, 0.4};
-	vector<float> w2 = {0.9, 1.0};
-	vector<float> biasn1n2 = {0.8, -0.1};
-	vector<float> biasn3n4 = {0.3};
+	// vector<float> w1 = {0.5, 0.4};
+	// vector<float> w2 = {0.9, 1.0};
+	// vector<float> biasn1n2 = {0.8, -0.1};
+	// vector<float> biasn3n4 = {0.3};
 
-	vector<vector<float>> wn1;
-	wn1.push_back(w1);
-	wn1.push_back(w2);
+	// vector<vector<float>> wn1;
+	// wn1.push_back(w1);
+	// wn1.push_back(w2);
 
-	vector<float> w3 = {-1.2, 1.1};
+	// vector<float> w3 = {-1.2, 1.1};
 
-	vector<vector<float>> wn2;
-	wn2.push_back(w3);
+	// vector<vector<float>> wn2;
+	// wn2.push_back(w3);
 
 	// Fixed number of layers
-	NeuronLayer *inputLayer = new NeuronLayer(numberOfInputsNeurons, "inputLayer", 0);
-	NeuronLayer *hiddenLayer = new NeuronLayer(numberOfHiddenNeurons, "hiddenLayer", numberOfInputsNeurons, wn1, biasn1n2);
-	NeuronLayer *outputLayer = new NeuronLayer(numberOfOutputNeurons, "outputLayer", numberOfHiddenNeurons, wn2, biasn3n4);
+	// NeuronLayer *inputLayer = new NeuronLayer(numberOfInputsNeurons, "inputLayer", 0);
+	// NeuronLayer *hiddenLayer = new NeuronLayer(numberOfHiddenNeurons, "hiddenLayer", numberOfInputsNeurons, wn1, biasn1n2);
+	// NeuronLayer *outputLayer = new NeuronLayer(numberOfOutputNeurons, "outputLayer", numberOfHiddenNeurons, wn2, biasn3n4);
 
-	// NeuronLayer *hiddenLayer = new NeuronLayer(numberOfHiddenNeurons, "hiddenLayer", numberOfInputsNeurons);
-	// NeuronLayer *outputLayer = new NeuronLayer(numberOfOutputNeurons, "outputLayer", numberOfHiddenNeurons);
+	NeuronLayer *inputLayer = new NeuronLayer(numberOfInputsNeurons, "inputLayer", 0);
+	NeuronLayer *hiddenLayer = new NeuronLayer(numberOfHiddenNeurons, "hiddenLayer", numberOfInputsNeurons);
+	NeuronLayer *outputLayer = new NeuronLayer(numberOfOutputNeurons, "outputLayer", numberOfHiddenNeurons);
 
 	inputLayer->connectNeurons(hiddenLayer);
 	hiddenLayer->connectNeurons(outputLayer);
-
+	instanteInicial = std::chrono::system_clock::now();
 	do
 	{
-		sumOfSquaredErrors = 0.0;
+		correct_predictions = 0;
+		accuracy = 0;
 		vector<float> layerInput;
 		for (int indexData = 0; indexData < dataSize; indexData++)
 		{
 			layerInput = inputs[indexData];
-			instanteInicial = std::chrono::system_clock::now();
 			this->feedForward(layerInput, hiddenLayer);
 			this->backpropagation(outputLayer, desiredOutputs[indexData]);
-			instanteFinal = std::chrono::system_clock::now();
-			std::chrono::duration<double> segundos = instanteFinal - instanteInicial;
-			cout << "SECONDS: " << segundos.count() << endl;
 		}
 		iterations++;
-	} while (iterations < 2);
+		accuracy = (float)correct_predictions / (float)dataSize;
+		cout << "Correct predictions: " << correct_predictions << endl;
+		cout << "Accuracy: " << accuracy << endl; 
+	} while ( accuracy < 0.80 );
 
-	cout << "Sum of squared errors: " << sumOfSquaredErrors << endl;
+	instanteFinal = std::chrono::system_clock::now();
+	std::chrono::duration<double> segundos = instanteFinal - instanteInicial;
+	cout << "SECONDS: " << segundos.count() << endl;
+	cout << "Correct predictions: " << correct_predictions << endl;
 	cout << "Number of iterations: " << iterations << endl;
 	delete inputLayer;
 	delete hiddenLayer;
@@ -165,6 +175,7 @@ void Algorithm::backpropagation(vector<Neuron *> *outputLayer, vector<float> des
 	vector<Neuron *> *neuronLayer = outputLayer;
 	vector<float> previousLayerErrors;
 	vector<vector<float>> previousWeights;
+	this->outputLayerErrors = 0;
 	// index = 3 -> output layer, index = 2 -> hidden layer, index = 1 -> input layer.
 	// Cycle to travers all layers from last one to first one.
 	for (int index = 3; index > 1; index--)
@@ -177,6 +188,10 @@ void Algorithm::backpropagation(vector<Neuron *> *outputLayer, vector<float> des
 		neuronLayer = neuronLayer->at(0)->getPreviousLayer();
 		this->previousLayerErrors = layerErrors;
 		this->previousWeights = layerWeights;
+	}
+
+	if(this->outputLayerErrors == 0){
+		this->correct_predictions++;
 	}
 }
 
@@ -196,6 +211,7 @@ void Algorithm::neuronLayerWeightCorrection(vector<Neuron *> *neuronLayer, vecto
 		neuron->setWeights(newWeights);
 		layerErrors.push_back(errorGradient);
 	}
+
 }
 
 float Algorithm::getNeuronErrorGradient(string neuronLayerRole, vector<float> desiredOutput,
@@ -205,8 +221,9 @@ float Algorithm::getNeuronErrorGradient(string neuronLayerRole, vector<float> de
 	if (neuronLayerRole == "outputLayer")
 	{
 		float error = this->functions->getError(desiredOutput[neuronIndex], output[neuronIndex]);
-		this->sumOfSquaredErrors += pow(error, 2);
 		errorGradient = this->functions->calculateErrorForOutputLayer(desiredOutput[neuronIndex], output[neuronIndex], error);
+		int interpretedError =  pow(this->functions->getError(desiredOutput[neuronIndex], this->interpretOutput(output[neuronIndex])), 2);
+		this->outputLayerErrors += interpretedError;
 	}
 	else
 	{
