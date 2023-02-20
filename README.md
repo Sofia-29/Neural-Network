@@ -12,7 +12,7 @@ Set all the weights and threshold levels of the network to random numbers unifor
 
 ### Step 2: Activation
 
-Activate the back-propagation neural network by applaying inputs $$x_{1}$$, $$x_{2}$$, $$x_{3}$$, ..., $$x_{n}$$ and desired outputs $$y_{1}$$, $$y_{2}$$, $$y_{3}$$, ..., $$y_{n}$$. 
+Activate the back-propagation neural network by applaying inputs $x_{1}$, $x_{2}$, $x_{3}$, ..., $x_{n}$ and desired outputs $y_{1}$, $y_{2}$, $y_{3}$, ..., $y_{n}$. 
 1. Calculate the actual outputs of the neurons in the hidden layer. This process is done by calculating the sigmoid function to the summation of each input times the weight less the bias of a neuron. 
 2. Calculate the actual outputs of the neurons in the output layer. This process is done by calculating the sigmoid function to the summation of each input times the weight less the bias of a neuron.
 
