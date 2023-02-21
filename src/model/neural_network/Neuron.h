@@ -90,12 +90,12 @@ inline vector<float> Neuron::getWeights()
 	return this->weights;
 }
 
-inline vector<Neuron *> *Neuron::getNextLayer()
+inline vector<Neuron*>* Neuron::getNextLayer()
 {
 	return outgoingNeurons;
 }
 
-inline vector<Neuron *> *Neuron::getPreviousLayer()
+inline vector<Neuron*>* Neuron::getPreviousLayer()
 {
 	return incomingNeurons;
 }
@@ -110,12 +110,12 @@ inline void Neuron::setBias(float bias)
 	this->bias = bias;
 }
 
-inline void Neuron::addIncomingNeuron(Neuron *neuron)
+inline void Neuron::addIncomingNeuron(Neuron* neuron)
 {
 	incomingNeurons->push_back(neuron);
 }
 
-inline void Neuron::addOutgoingNeuron(Neuron *neuron)
+inline void Neuron::addOutgoingNeuron(Neuron* neuron)
 {
 	outgoingNeurons->push_back(neuron);
 }
@@ -135,10 +135,10 @@ float Neuron::activationFunction(vector<float> input)
 vector<float> Neuron::weightsCorrection(float learningRate, float errorGradient, vector<float> input)
 {
 	vector<float> newWeights;
-	for (int index1 = 0; index1 < weights.size(); index1++)
+	for (int index = 0; index < weights.size(); index++)
 	{
-		float weightCorrection = learningRate * input[index1] * errorGradient;
-		float newWeight = weights[index1] + weightCorrection;
+		float weightCorrection = learningRate * input[index] * errorGradient;
+		float newWeight = weights[index] + weightCorrection;
 		newWeights.push_back(newWeight);
 	}
 	this->bias += (learningRate * -1 * errorGradient);
@@ -152,6 +152,6 @@ string Neuron::toString()
 	{
 		os << weights[index] << ",";
 	}
-	os << endl << "Bias: " <<  this->bias;
+	os << endl << "Bias: " << this->bias;
 	return os.str();
 }

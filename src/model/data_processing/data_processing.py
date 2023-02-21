@@ -3,7 +3,7 @@ import pandas as pd
 
 neural_network_caller = ctypes.CDLL('./neuralNetworkCaller.so')
 threshold = 0.5
-learning_rate = 0.5;
+learning_rate = 0.5
 
 def read_csv_file(name : str) -> pd.DataFrame:
     dataframe = pd.read_csv(name, header=None, sep=',')

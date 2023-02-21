@@ -22,9 +22,9 @@ public:
 	void givePredictions(vector<float>, vector<float>);
 	int interpretOutput(float);
 
-	void feedForward(vector<float>, vector<Neuron *> *);
+	void feedForward(vector<Neuron *> *);
 	void backpropagation(vector<Neuron *> *, vector<float>);
-	void neuronLayerActivation(vector<Neuron *> *, vector<float>, vector<float> &);
+	void neuronLayerActivation(vector<Neuron *> *, vector<float>);
 	void neuronLayerWeightCorrection(vector<Neuron *> *, vector<float>, vector<vector<float>> &, vector<float> &);
 	float getNeuronErrorGradient(string, vector<float>, vector<float>, int);
 
@@ -37,8 +37,8 @@ private:
 	float sumOfSquaredErrors;
 
 	Functions *functions;
-	vector<vector<float>> *actualOutputs;
-	vector<vector<float>> *layerInputs;
+	vector<vector<float>> actualOutputs;
+	vector<vector<float>> layerInputs;
 
 	vector<float> previousLayerErrors;
 	vector<vector<float>> previousWeights;
@@ -51,8 +51,6 @@ Algorithm::Algorithm()
 	correct_predictions = 0;
 	outputLayerErrors = 0;
 	functions = new Functions();
-	actualOutputs = new vector<vector<float>>();
-	layerInputs = new vector<vector<float>>();
 	
 }
 
@@ -64,15 +62,11 @@ Algorithm::Algorithm(float threshold, float learningRate)
 	outputLayerErrors = 0;
 
 	functions = new Functions();
-	actualOutputs = new vector<vector<float>>();
-	layerInputs = new vector<vector<float>>();
 }
 
 Algorithm::~Algorithm()
 {
 	delete this->functions;
-	delete this->actualOutputs;
-	delete this->layerInputs;
 }
 
 void Algorithm::startAlgorithm(int numberOfInputsNeurons, int numberOfOutputNeurons,
@@ -117,18 +111,12 @@ void Algorithm::startAlgorithm(int numberOfInputsNeurons, int numberOfOutputNeur
 		sumOfSquaredErrors = 0.0;
 		correct_predictions = 0;
 		accuracy = 0;
-		vector<float> layerInput;
 		for (int indexData = 0; indexData < dataSize; indexData++)
 		{
-			layerInput = inputs[indexData];
-			this->feedForward(layerInput, hiddenLayer);
+			this->layerInputs.push_back(inputs[indexData]);
+			this->feedForward(hiddenLayer);
 			this->backpropagation(outputLayer, desiredOutputs[indexData]);
 		}
-
-		this->actualOutputs->clear();
-		this->layerInputs->clear();
-		this->previousLayerErrors.clear();
-		this->previousWeights.clear();
 		
 		iterations++;
 		accuracy = (float)correct_predictions / (float)dataSize;
@@ -148,24 +136,21 @@ void Algorithm::startAlgorithm(int numberOfInputsNeurons, int numberOfOutputNeur
 	delete outputLayer;
 }
 
-void Algorithm::feedForward(vector<float> layerInput, vector<Neuron *> *neuronLayer)
+void Algorithm::feedForward(vector<Neuron *> *neuronLayer)
 {
 	// All data goes throught the layers, starting from the input layer and ending in the output layer.
 	// index = 1 -> input layer, index = 2 -> hidden layer, index = 3 -> output layer.
-	for (int indexLayer = 2; indexLayer <= 3; indexLayer++)
+	while(!neuronLayer->empty())
 	{
-		vector<float> inputNextLayer;
-		this->layerInputs->push_back(layerInput);
-		this->neuronLayerActivation(neuronLayer, layerInput, inputNextLayer);
-		layerInput = inputNextLayer;
+		this->neuronLayerActivation(neuronLayer, this->layerInputs.back());
 		neuronLayer = neuronLayer->at(0)->getNextLayer();
 	}
 }
 
-void Algorithm::neuronLayerActivation(vector<Neuron *> *neuronLayer, vector<float> input,
-									  vector<float> &inputNextLayer)
+void Algorithm::neuronLayerActivation(vector<Neuron *> *neuronLayer, vector<float> input)
 {
 	vector<float> outputValues;
+	vector<float> inputNextLayer;
 	int size = neuronLayer->size();
 	for (int neuronIndex = 0; neuronIndex < size; neuronIndex++)
 	{
@@ -174,7 +159,10 @@ void Algorithm::neuronLayerActivation(vector<Neuron *> *neuronLayer, vector<floa
 		inputNextLayer.push_back(value); // The output of a layer is the input of the next layer
 		outputValues.push_back(value);
 	}
-	this->actualOutputs->push_back(outputValues);
+	this->actualOutputs.push_back(outputValues);
+	if (neuronLayer->front()->getRole() != "outputLayer") { //We don't need to store the output of Output layer as input of next layer
+		this->layerInputs.push_back(inputNextLayer);
+	}
 }
 
 void Algorithm::backpropagation(vector<Neuron *> *outputLayer, vector<float> desiredOutput)
@@ -203,8 +191,8 @@ void Algorithm::neuronLayerWeightCorrection(vector<Neuron *> *neuronLayer, vecto
 {
 	int size = neuronLayer->size();
 	string neuronLayerRole = neuronLayer->at(0)->getRole();
-	vector<float> output = this->actualOutputs->back();
-	vector<float> input = this->layerInputs->back();
+	vector<float> output = this->actualOutputs.back();
+	vector<float> input = this->layerInputs.back();
 	for (int neuronIndex = 0; neuronIndex < size; neuronIndex++)
 	{
 		Neuron *neuron = neuronLayer->at(neuronIndex);
@@ -214,8 +202,8 @@ void Algorithm::neuronLayerWeightCorrection(vector<Neuron *> *neuronLayer, vecto
 		neuron->setWeights(newWeights);
 		layerErrors.push_back(errorGradient);
 	}
-	this->layerInputs->erase(this->layerInputs->begin() + this->layerInputs->size() - 1);
-	this->actualOutputs->erase(this->actualOutputs->begin() + this->actualOutputs->size() - 1);
+	this->layerInputs.erase(this->layerInputs.begin() + this->layerInputs.size() - 1);
+	this->actualOutputs.erase(this->actualOutputs.begin() + this->actualOutputs.size() - 1);
 }
 
 float Algorithm::getNeuronErrorGradient(string neuronLayerRole, vector<float> desiredOutput,
