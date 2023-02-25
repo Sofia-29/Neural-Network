@@ -29,16 +29,6 @@ NeuronLayer::NeuronLayer(int amountOfLayerNeurons, string role, int amountOfPrev
 	}
 }
 
-NeuronLayer::NeuronLayer(int amountOfLayerNeurons, string role, int amountOfPreviousLayerNeurons,
-						 vector<vector<float>> weights, vector<float> bias)
-{
-	this->reserve(amountOfLayerNeurons);
-	for(int index = 0; index < amountOfLayerNeurons; index++)
-	{
-		this->push_back(new Neuron(role, amountOfPreviousLayerNeurons, weights.at(index), bias.at(index)));
-	}
-}
-
 NeuronLayer::~NeuronLayer()
 {
 	for (int index = 0; index < this->size(); index++)

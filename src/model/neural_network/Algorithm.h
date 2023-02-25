@@ -80,25 +80,6 @@ void Algorithm::startAlgorithm(int numberOfInputsNeurons, int numberOfOutputNeur
 	float accuracy = 0.0; 
 	std::chrono::time_point<std::chrono::system_clock> instanteInicial, instanteFinal;
 
-	// vector<float> w1 = {0.5, 0.4};
-	// vector<float> w2 = {0.9, 1.0};
-	// vector<float> biasn1n2 = {0.8, -0.1};
-	// vector<float> biasn3n4 = {0.3};
-
-	// vector<vector<float>> wn1;
-	// wn1.push_back(w1);
-	// wn1.push_back(w2);
-
-	// vector<float> w3 = {-1.2, 1.1};
-
-	// vector<vector<float>> wn2;
-	// wn2.push_back(w3);
-
-	// Fixed number of layers
-	// NeuronLayer *inputLayer = new NeuronLayer(numberOfInputsNeurons, "inputLayer", 0);
-	// NeuronLayer *hiddenLayer = new NeuronLayer(numberOfHiddenNeurons, "hiddenLayer", numberOfInputsNeurons, wn1, biasn1n2);
-	// NeuronLayer *outputLayer = new NeuronLayer(numberOfOutputNeurons, "outputLayer", numberOfHiddenNeurons, wn2, biasn3n4);
-
 	NeuronLayer *inputLayer = new NeuronLayer(numberOfInputsNeurons, "inputLayer", 0);
 	NeuronLayer *hiddenLayer = new NeuronLayer(numberOfHiddenNeurons, "hiddenLayer", numberOfInputsNeurons);
 	NeuronLayer *outputLayer = new NeuronLayer(numberOfOutputNeurons, "outputLayer", numberOfHiddenNeurons);
@@ -117,7 +98,6 @@ void Algorithm::startAlgorithm(int numberOfInputsNeurons, int numberOfOutputNeur
 			this->feedForward(hiddenLayer);
 			this->backpropagation(outputLayer, desiredOutputs[indexData]);
 		}
-		
 		iterations++;
 		accuracy = (float)correct_predictions / (float)dataSize;
 	//	cout << "Correct predictions: " << correct_predictions << endl;
