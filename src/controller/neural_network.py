@@ -18,22 +18,21 @@ app.add_middleware(
 data_processing = None
 
 @app.post("/split-dataset")
-async def split_dataset(dataset: UploadFile = File(...), normalize_data: bool = Form(...), map_desired_output: bool = Form(...), ):
+async def split_dataset(file: UploadFile = File(...), normalize_data: bool = Form(...), map_desired_output: bool = Form(...), ):
     try:
-        # contents = None
-        async with dataset:
-            contents = await dataset.read()
-        # print(contents)
-        dataframe = pd.read_csv(contents.decode())
-        #data_processing = DataProcessing(dataframe)
+        print(type(file))
+        # dataset = pd.read_csv(file.file)
+        # print(dataset)
+        # data_processing = DataProcessing(dataset=dataset)
+        # print(data_processing.dataset)
+        # print()
+        #data_processing.start_preprocessing(normalize=normalize_data, map_desired_output=map_desired_output)
+        #print(data_processing.desired_output_mapped)
 
-        # print(normalize_data)
-        # print(map_desired_output)
-        #data_processing.start_preprocessing(normalize_data, map_desired_output)
     except Exception:
         return {"response": "Error"}
     finally:
-        dataset.file.close()
+        file.file.close()
     return {"response": "Ok"}
 
 

@@ -4,22 +4,23 @@
   padding: 2rem;
 }
 
-.upload-button {
-  align-items: center;
-  background-color: #f2f2f2;
-  border: none;
-  border-radius: 2px;
-  color: #757575;
-  cursor: pointer;
-  display: flex;
-  font-size: 1.5em;
-  height: 50px;
-  justify-content: space-between;
-  margin: 4px 2px;
-  padding: 0px 12px;
-  text-align: center;
-  text-decoration: none;
-  transition-duration: 0.3s;
-  width: 500px;
-  border-radius: 20px;
+.drop-zone {
+  background-color: #ccffcc;
 }
+
+.drop-zone.is-over {
+  background-color: #aaffaa;
+}
+
+.drag-drop-area {
+  border: 2px dashed #757575;
+  padding: 20px;
+  text-align: center;
+  font-size: 1.2rem;
+  color: #f2f2f2;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
