@@ -26,3 +26,8 @@ Update the weights in the back-propagation network propagating backward the erro
 ### Step 4: Iteration
 
 Increased iteration by one, go back to step 2, and repeat the process until the selected error criterion is satisfied.
+
+## How to use
+
+1. Start by opening a WSL terminal in the folder "src/controller/neural_network", then run the FastApi server with the following command: uvicorn neural_network:app --reload
+2. 

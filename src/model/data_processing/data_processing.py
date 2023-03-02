@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
-from helpers import fill_pointer_list, read_csv_file
+from .helpers import fill_pointer_list, read_csv_file
 
 
 class DataProcessing:
@@ -96,11 +96,11 @@ class DataProcessing:
         self.desired_output = desired_output
 
 
-def main():
+# def main():
 
-    input = read_csv_file('./Iris.csv')
-    preprocessing = DataProcessing(input)
-    preprocessing.start_preprocessing(True, True)
-    preprocessing.train_dataset()
+#     input = read_csv_file('./Iris.csv')
+#     preprocessing = DataProcessing(input)
+#     preprocessing.start_preprocessing(True, True)
+#     preprocessing.train_dataset()
 
-main()
+# main()
