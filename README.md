@@ -30,4 +30,6 @@ Increased iteration by one, go back to step 2, and repeat the process until the 
 ## How to use
 
 1. Start by opening a WSL terminal in the folder "src/controller/neural_network", then run the FastApi server with the following command: uvicorn neural_network:app --reload
-2. 
+2. Open a terminal in Powershell go to src/view and run the following command: yarn
+3. In the same Poweshell terminal, run the following command: yarn dev
+Then you can check out the page in http://127.0.0.1:5173/

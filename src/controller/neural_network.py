@@ -2,6 +2,7 @@ import sys
 sys.path.append('..')
 from model.data_processing.data_processing import DataProcessing
 
+import ctypes
 import pandas as pd
 from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,19 +17,15 @@ app.add_middleware(
 )
 
 data_processing = None
+neural_network_caller = ctypes.CDLL(
+            '../model/shared_object/neuralNetworkCaller.so')
 
 @app.post("/split-dataset")
 async def split_dataset(file: UploadFile = File(...), normalize_data: bool = Form(...), map_desired_output: bool = Form(...), ):
     try:
-        print(type(file))
-        # dataset = pd.read_csv(file.file)
-        # print(dataset)
-        # data_processing = DataProcessing(dataset=dataset)
-        # print(data_processing.dataset)
-        # print()
-        #data_processing.start_preprocessing(normalize=normalize_data, map_desired_output=map_desired_output)
-        #print(data_processing.desired_output_mapped)
-
+        dataset = pd.read_csv(file.file)
+        data_processing = DataProcessing(dataset=dataset, neural_network_caller=neural_network_caller)
+        data_processing.start_preprocessing(normalize=normalize_data, map_desired_output=map_desired_output)
     except Exception:
         return {"response": "Error"}
     finally:

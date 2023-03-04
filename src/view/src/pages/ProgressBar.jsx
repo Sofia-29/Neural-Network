@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-export const ProgressBar = () => {
+export const ProgressBar = ( selectedFile) => {
+  
 
 
   return (

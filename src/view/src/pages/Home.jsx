@@ -9,7 +9,7 @@ import axios from "axios";
 
 import "../styles/home.css";
 
-const ColorButton = styled(Button)(({ theme }) => ({
+const ColorButton = styled(Button)(() => ({
   color: "#f2f2f2",
   backgroundColor: "#757575",
   "&:hover": {
@@ -36,7 +36,7 @@ export const Home = () => {
   };
 
   const handleChangeMapOutDesiredOutput = () => {
-    setmapOutDesiredOutput(!mapOutDesiredOutput);
+    setmapOutDesiredOutput(!mapOutDesiredOutput);mn8569
   };
 
   const handleDrop = (event) => {
@@ -54,18 +54,13 @@ export const Home = () => {
     fileInput.click();
   };
 
-  useEffect( () => {
-    console.log(selectedFile);
-  }, [selectedFile]);
-
   const submitDataset = () => {
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("normalize_data", normalizeData);
     formData.append("map_desired_output", mapOutDesiredOutput);
 
-    axios
-      .post("http://127.0.0.1:8000/split-dataset", formData, {
+    axios.post("http://127.0.0.1:8000/split-dataset", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

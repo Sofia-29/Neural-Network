@@ -9,13 +9,12 @@ from .helpers import fill_pointer_list, read_csv_file
 
 class DataProcessing:
 
-    def __init__(self, dataset: pd.DataFrame) -> None:
+    def __init__(self, dataset: pd.DataFrame, neural_network_caller: ctypes.CDLL) -> None:
+        self.neural_network_caller = neural_network_caller
         self.dataset = dataset
         self.desired_output = []
         self.desired_output_mapped = {}
         self.splitted_dataset = {}
-        self.neural_network_caller = ctypes.CDLL(
-            '../shared_object/neuralNetworkCaller.so')
         self.threshold = 0.5
         self.learning_rate = 0.5
 
