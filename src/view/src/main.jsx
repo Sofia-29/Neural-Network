@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import { Home } from "./pages/Home";
-import { ProgressBar } from "./pages/ProgressBar";
+import { DatasetProcessing } from "./pages/DatasetProcessing";
 import "./styles/main.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -11,7 +11,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Router>
       <Routes>
         <Route exact path="/" element={<Home />} />
-        <Route exact path="/progress-bar" element={<ProgressBar />} />
+        <Route exact path="/dataset-processing" element={<DatasetProcessing />} />
       </Routes>
     </Router>
   </React.StrictMode>

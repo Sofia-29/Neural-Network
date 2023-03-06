@@ -4,21 +4,14 @@
   padding: 2rem;
 }
 
-.drop-zone {
-  background-color: #ccffcc;
-}
-
-.drop-zone.is-over {
-  background-color: #aaffaa;
-}
-
 .drag-drop-area {
-  border: 2px dashed #757575;
+  border: 2px dashed #aeb0b9;
   padding: 20px;
   text-align: center;
   font-size: 1.2rem;
   color: #f2f2f2;
-  height: 200px;
+  height: 300px;
+  width: 500px;
   display: flex;
   justify-content: center;
   align-items: center;

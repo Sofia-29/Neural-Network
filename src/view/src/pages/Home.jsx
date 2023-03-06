@@ -1,10 +1,7 @@
-import { useEffect, useState } from "react";
-import { redirect } from "react-router-dom";
-import { Checkbox, FormGroup, FormControlLabel } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
-import axios from "axios";
+import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import { Checkbox, FormGroup, FormControlLabel, 
+  Button, Box, styled } from "@mui/material";
 
 
 import "../styles/home.css";
@@ -21,6 +18,7 @@ export const Home = () => {
   const [normalizeData, setNormalizeData] = useState(true);
   const [mapOutDesiredOutput, setmapOutDesiredOutput] = useState(true);
   const [selectedFile, setSelectedFile] = useState(null);
+  const navigate = useNavigate();
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -31,12 +29,13 @@ export const Home = () => {
     setSelectedFile(file);
   };
 
+
   const handleChangeNormalizeData = () => {
     setNormalizeData(!normalizeData);
   };
 
   const handleChangeMapOutDesiredOutput = () => {
-    setmapOutDesiredOutput(!mapOutDesiredOutput);mn8569
+    setmapOutDesiredOutput(!mapOutDesiredOutput);
   };
 
   const handleDrop = (event) => {
@@ -52,22 +51,6 @@ export const Home = () => {
   const handleSelectClick = () => {
     const fileInput = document.getElementById('fileInput');
     fileInput.click();
-  };
-
-  const submitDataset = () => {
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-    formData.append("normalize_data", normalizeData);
-    formData.append("map_desired_output", mapOutDesiredOutput);
-
-    axios.post("http://127.0.0.1:8000/split-dataset", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
-        console.log(response);
-      });
   };
 
   return (
@@ -127,7 +110,7 @@ export const Home = () => {
             />
           }
           label={
-            <Box component="div" fontSize={20}>
+            <Box component="div" fontSize={ 20 }>
               Map out labels
             </Box>
           }
@@ -138,8 +121,9 @@ export const Home = () => {
         variant="contained"
         disabled={selectedFile ? false : true}
         onClick={() => {
-          submitDataset();
-          redirect("/progress-bar");
+          navigate('/dataset-processing',{ state:
+            { normalizeData: normalizeData, mapOutDesiredOutput: mapOutDesiredOutput, file: selectedFile } }
+          );
         }}
       >
         Submit
