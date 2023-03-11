@@ -105,11 +105,11 @@ void Algorithm::startAlgorithm(int numberOfInputsNeurons, int numberOfOutputNeur
 		iterations++;
 		accuracy = (float)correct_predictions / (float)dataSize;
 		this->trainingErrors.push_back(sumOfSquaredErrors);
-		// cout << "Sum of squared errors: " << sumOfSquaredErrors << endl;
-	//	cout << "Correct predictions: " << correct_predictions << endl;
-	//	cout << "Accuracy: " << accuracy << endl; 
+		cout << "Sum of squared errors: " << sumOfSquaredErrors << endl;
+		cout << "Correct predictions: " << correct_predictions << endl;
+		cout << "Accuracy: " << accuracy << endl; 
 	//} while ( accuracy < 0.80 );
-	} while(sumOfSquaredErrors > 0.001);
+	} while(sumOfSquaredErrors > 0.001 || accuracy < 0.80);
 
 	instanteFinal = std::chrono::system_clock::now();
 	std::chrono::duration<double> segundos = instanteFinal - instanteInicial;

@@ -20,16 +20,18 @@ class DataProcessing:
 
     def start_preprocessing(self, normalize: bool, map_desired_output: bool):
         self.verify_id_column()
-        self.dataset.drop([0], inplace=True)
+        self.dataset.drop(0, axis=0, inplace=True)
+        self.dataset = self.dataset.sample(frac=1)
+
         if map_desired_output:
             self.map_out_desired_output()
         else:
             last_column = self.dataset.iloc[:, -1].values
             self.desired_output = [[last_column[index]] for index in range(len(last_column))]
+
         self.dataset.drop(
             columns=self.dataset.columns[-1], axis=1, inplace=True)
-        self.dataset = self.dataset.apply(pd.to_numeric)
-        self.dataset = self.dataset.sample(frac=1)
+
         if normalize:
             self.normalize_data()
         self.split_dataset()
@@ -42,17 +44,14 @@ class DataProcessing:
         # y_train_dataset = self.desired_output
         # print(x_train_dataset)
         # print(y_train_dataset)
-
         x_rows_count = len(x_train_dataset)
         x_column_count = len(x_train_dataset[0])
-
         input_pointer = (ctypes.POINTER(ctypes.c_float) * x_rows_count)()
         fill_pointer_list(input_pointer, x_train_dataset,
                           x_rows_count, x_column_count)
 
         y_rows_count = len(y_train_dataset)
         y_column_count = len(y_train_dataset[0])
-
         desired_output_pointer = (ctypes.POINTER(
             ctypes.c_float) * y_rows_count)()
         fill_pointer_list(desired_output_pointer,
@@ -103,14 +102,14 @@ class DataProcessing:
         self.desired_output = desired_output
 
 
-def main():
-    neural_network_caller = ctypes.CDLL(
-        '../shared_object/neuralNetworkCaller.so')
-    input = read_csv_file('./Iris.csv')
-    preprocessing = DataProcessing(input, neural_network_caller)
-    preprocessing.start_preprocessing(True, True)
+# def main():
+#     neural_network_caller = ctypes.CDLL(
+#         '../shared_object/neuralNetworkCaller.so')
+#     input = read_csv_file('./Iris.csv')
+#     preprocessing = DataProcessing(input, neural_network_caller)
+#     preprocessing.start_preprocessing(False, False)
     
-    preprocessing.train_dataset()
+#     preprocessing.train_dataset()
 
 
-main()
+# main()
