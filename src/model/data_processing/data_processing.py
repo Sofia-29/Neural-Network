@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
-from .helpers import fill_pointer_list, read_csv_file
+from helpers import fill_pointer_list, read_csv_file
 
 
 class DataProcessing:
@@ -20,34 +20,39 @@ class DataProcessing:
 
     def start_preprocessing(self, normalize: bool, map_desired_output: bool):
         self.verify_id_column()
-        self.dataset.drop(0, axis=0, inplace=True)
-        self.dataset = self.dataset.sample(frac=1)
-        self.dataset.to_csv('Original.csv', index=False)
-
+        self.dataset.drop([0], inplace=True)
         if map_desired_output:
             self.map_out_desired_output()
         else:
-            self.desired_output = self.dataset.iloc[:, -1]
-
+            last_column = self.dataset.iloc[:, -1].values
+            self.desired_output = [[last_column[index]] for index in range(len(last_column))]
         self.dataset.drop(
             columns=self.dataset.columns[-1], axis=1, inplace=True)
-
+        self.dataset = self.dataset.apply(pd.to_numeric)
+        self.dataset = self.dataset.sample(frac=1)
         if normalize:
             self.normalize_data()
-        self.dataset.to_csv('Normalizado.csv', index=False)
         self.split_dataset()
-    
+      
+
     def train_dataset(self) -> None:
         x_train_dataset = self.splitted_dataset['x_train']
         y_train_dataset = self.splitted_dataset['y_train']
+        # x_train_dataset = self.dataset.values
+        # y_train_dataset = self.desired_output
+        # print(x_train_dataset)
+        # print(y_train_dataset)
+
         x_rows_count = len(x_train_dataset)
         x_column_count = len(x_train_dataset[0])
+
         input_pointer = (ctypes.POINTER(ctypes.c_float) * x_rows_count)()
         fill_pointer_list(input_pointer, x_train_dataset,
                           x_rows_count, x_column_count)
 
         y_rows_count = len(y_train_dataset)
         y_column_count = len(y_train_dataset[0])
+
         desired_output_pointer = (ctypes.POINTER(
             ctypes.c_float) * y_rows_count)()
         fill_pointer_list(desired_output_pointer,
@@ -65,9 +70,12 @@ class DataProcessing:
                           number_of_output_neurons, input_pointer, desired_output_pointer, x_rows_count)
 
     def verify_id_column(self) -> None:
-        for column_name in self.dataset.columns:
-            if isinstance(column_name, str) and 'id' in column_name.lower():
-                self.dataset.drop(column_name, axis=1, inplace=True)
+        first_row = self.dataset.iloc[0]
+        counter = 0
+        for column_name in first_row:
+            if isinstance(column_name, str) and 'id' == column_name.lower():
+                self.dataset.drop(counter, axis=1, inplace=True)
+            counter += 1
 
     def normalize_data(self) -> None:
         scaler = MinMaxScaler()
@@ -95,11 +103,14 @@ class DataProcessing:
         self.desired_output = desired_output
 
 
-# def main():
+def main():
+    neural_network_caller = ctypes.CDLL(
+        '../shared_object/neuralNetworkCaller.so')
+    input = read_csv_file('./Iris.csv')
+    preprocessing = DataProcessing(input, neural_network_caller)
+    preprocessing.start_preprocessing(True, True)
+    
+    preprocessing.train_dataset()
 
-#     input = read_csv_file('./Iris.csv')
-#     preprocessing = DataProcessing(input)
-#     preprocessing.start_preprocessing(True, True)
-#     preprocessing.train_dataset()
 
-# main()
+main()

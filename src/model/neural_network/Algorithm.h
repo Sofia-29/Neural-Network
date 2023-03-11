@@ -3,11 +3,12 @@
 #include <vector>
 #include <string>
 #include <math.h>
+#include <chrono>
 
 #include "Neuron.h"
 #include "NeuronLayer.h"
 #include "Functions.h"
-#include <chrono>
+#include "FileManager.h"
 
 using namespace std;
 
@@ -37,11 +38,13 @@ private:
 	float sumOfSquaredErrors;
 
 	Functions *functions;
+	FileManager *fileManager;
 	vector<vector<float>> actualOutputs;
 	vector<vector<float>> layerInputs;
 
 	vector<float> previousLayerErrors;
 	vector<vector<float>> previousWeights;
+	vector<float> trainingErrors;
 };
 
 Algorithm::Algorithm()
@@ -51,7 +54,7 @@ Algorithm::Algorithm()
 	correct_predictions = 0;
 	outputLayerErrors = 0;
 	functions = new Functions();
-	
+	fileManager = new FileManager();
 }
 
 Algorithm::Algorithm(float threshold, float learningRate)
@@ -60,13 +63,14 @@ Algorithm::Algorithm(float threshold, float learningRate)
 	this->learningRate = learningRate;
 	correct_predictions = 0;
 	outputLayerErrors = 0;
-
 	functions = new Functions();
+	fileManager = new FileManager();
 }
 
 Algorithm::~Algorithm()
 {
 	delete this->functions;
+	delete this->fileManager;
 }
 
 void Algorithm::startAlgorithm(int numberOfInputsNeurons, int numberOfOutputNeurons,
@@ -100,6 +104,8 @@ void Algorithm::startAlgorithm(int numberOfInputsNeurons, int numberOfOutputNeur
 		}
 		iterations++;
 		accuracy = (float)correct_predictions / (float)dataSize;
+		this->trainingErrors.push_back(sumOfSquaredErrors);
+		// cout << "Sum of squared errors: " << sumOfSquaredErrors << endl;
 	//	cout << "Correct predictions: " << correct_predictions << endl;
 	//	cout << "Accuracy: " << accuracy << endl; 
 	//} while ( accuracy < 0.80 );
@@ -107,10 +113,12 @@ void Algorithm::startAlgorithm(int numberOfInputsNeurons, int numberOfOutputNeur
 
 	instanteFinal = std::chrono::system_clock::now();
 	std::chrono::duration<double> segundos = instanteFinal - instanteInicial;
-	cout << "SECONDS: " << segundos.count() << endl;
-	cout << "SEE: " << sumOfSquaredErrors << endl; 
-	//cout << "Correct predictions: " << correct_predictions << endl;
-	cout << "Number of iterations: " << iterations << endl;
+	trainingErrors.push_back((float)segundos.count());
+	fileManager->saveCSV(trainingErrors);
+	// cout << "SECONDS: " << segundos.count() << endl;
+	// cout << "SEE: " << sumOfSquaredErrors << endl; 
+	// //cout << "Correct predictions: " << correct_predictions << endl;
+	// cout << "Number of iterations: " << iterations << endl;
 	delete inputLayer;
 	delete hiddenLayer;
 	delete outputLayer;
