@@ -22,7 +22,7 @@ FileManager::~FileManager() {}
 
 void FileManager::saveCSV(const vector<float> trainingErrors)
 {
-	string output_path = "../training_errors/training_errors.csv";
+	string output_path = "../model/training_errors/training_errors.csv";
     ofstream outfile(output_path);
 
     if (!outfile.is_open()) {

@@ -4,46 +4,45 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
-from helpers import fill_pointer_list, read_csv_file
+from .helpers import fill_pointer_list, read_csv_file
 
 
 class DataProcessing:
 
-    def __init__(self, dataset: pd.DataFrame, neural_network_caller: ctypes.CDLL) -> None:
+    def __init__(self, neural_network_caller: ctypes.CDLL) -> None:
         self.neural_network_caller = neural_network_caller
-        self.dataset = dataset
+        self.dataset = None
         self.desired_output = []
         self.desired_output_mapped = {}
         self.splitted_dataset = {}
         self.threshold = 0.5
         self.learning_rate = 0.5
 
-    def start_preprocessing(self, normalize: bool, map_desired_output: bool):
+    def start_preprocessing(self, dataset: pd.DataFrame, normalize: bool, 
+                            map_desired_output: bool, split_dataset: bool):
+        self.dataset = dataset
         self.verify_id_column()
-        self.dataset.drop(0, axis=0, inplace=True)
         self.dataset = self.dataset.sample(frac=1)
-
         if map_desired_output:
             self.map_out_desired_output()
         else:
             last_column = self.dataset.iloc[:, -1].values
             self.desired_output = [[last_column[index]] for index in range(len(last_column))]
-
         self.dataset.drop(
             columns=self.dataset.columns[-1], axis=1, inplace=True)
 
         if normalize:
             self.normalize_data()
-        self.split_dataset()
+
+        if split_dataset:
+            self.split_dataset()
+        else:
+            self.splitted_dataset = {'x_train': self.dataset.values, 'y_train': self.desired_output}
       
 
     def train_dataset(self) -> None:
         x_train_dataset = self.splitted_dataset['x_train']
         y_train_dataset = self.splitted_dataset['y_train']
-        # x_train_dataset = self.dataset.values
-        # y_train_dataset = self.desired_output
-        # print(x_train_dataset)
-        # print(y_train_dataset)
         x_rows_count = len(x_train_dataset)
         x_column_count = len(x_train_dataset[0])
         input_pointer = (ctypes.POINTER(ctypes.c_float) * x_rows_count)()
@@ -64,7 +63,6 @@ class DataProcessing:
         run_data_training.argtypes = [ctypes.c_float, ctypes.c_float, ctypes.c_int, ctypes.c_int, ctypes.POINTER(
             ctypes.c_float) * x_rows_count, ctypes.POINTER(ctypes.c_float) * y_rows_count, ctypes.c_int]
         run_data_training.restype = None
-
         run_data_training(self.threshold, self.learning_rate, number_of_input_neurons,
                           number_of_output_neurons, input_pointer, desired_output_pointer, x_rows_count)
 
@@ -87,7 +85,6 @@ class DataProcessing:
 
         x_validation, x_test, y_validation, y_test = train_test_split(
             x_test, y_test, test_size=0.10)
-
         self.splitted_dataset = {'x_train': x_train, 'y_train': list(y_train), 'x_validation': x_validation,
                                  'y_validation': list(y_validation), 'x_test': x_test, 'y_test': list(y_test)}
 

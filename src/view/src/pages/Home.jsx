@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import { Checkbox, FormGroup, FormControlLabel, 
-  Button, Box, styled } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { FormGroup, Button, Box, styled } from "@mui/material";
 
-
+import { CustomCheckbox } from "../components/CustomCheckbox";
 import "../styles/home.css";
 
 const ColorButton = styled(Button)(() => ({
@@ -17,18 +16,9 @@ const ColorButton = styled(Button)(() => ({
 export const Home = () => {
   const [normalizeData, setNormalizeData] = useState(true);
   const [mapOutDesiredOutput, setmapOutDesiredOutput] = useState(true);
+  const [splitDataset, setSplitDataset] = useState(true);
   const [selectedFile, setSelectedFile] = useState(null);
   const navigate = useNavigate();
-
-  const handleFileSelect = (event) => {
-    const file = event.target.files[0];
-    if (file.type !== "text/csv") {
-      console.log("Only CSV files are accepted");
-      return;
-    }
-    setSelectedFile(file);
-  };
-
 
   const handleChangeNormalizeData = () => {
     setNormalizeData(!normalizeData);
@@ -36,6 +26,19 @@ export const Home = () => {
 
   const handleChangeMapOutDesiredOutput = () => {
     setmapOutDesiredOutput(!mapOutDesiredOutput);
+  };
+
+  const handleChangeSplitDataset = () => {
+    setSplitDataset(!splitDataset);
+  };
+  
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file.type !== "text/csv") {
+      console.log("Only CSV files are accepted");
+      return;
+    }
+    setSelectedFile(file);
   };
 
   const handleDrop = (event) => {
@@ -49,7 +52,7 @@ export const Home = () => {
   };
 
   const handleSelectClick = () => {
-    const fileInput = document.getElementById('fileInput');
+    const fileInput = document.getElementById("fileInput");
     fileInput.click();
   };
 
@@ -57,73 +60,55 @@ export const Home = () => {
     <>
       <div
         className="drag-drop-area"
-        onDrop = { handleDrop }
+        onDrop={handleDrop}
         onDragOver={(event) => event.preventDefault()}
         onDragEnter={(event) => event.preventDefault()}
-        onClick={ handleSelectClick }
+        onClick={handleSelectClick}
       >
-          { selectedFile ? (
-            <p>{ selectedFile.name }</p>
-          ) : (
-            <p>Drop CSV file here or click to select</p>
-          ) }
-          <input
-            id="fileInput"
-            type="file"
-            accept=".csv"
-            onChange={ handleFileSelect }
-            style={{ display: 'none' }}
-          />
+        {selectedFile ? (
+          <p>{selectedFile.name}</p>
+        ) : (
+          <p>Drop CSV file here or click to select</p>
+        )}
+        <input
+          id="fileInput"
+          type="file"
+          accept=".csv"
+          onChange={handleFileSelect}
+          style={{ display: "none" }}
+        />
       </div>
 
       <FormGroup row={true} sx={{ m: 3 }}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={normalizeData}
-              sx={{
-                color: "#f2f2f2",
-                "&.Mui-checked": {
-                  color: "#f2f2f2",
-                },
-              }}
-              onClick={handleChangeNormalizeData}
-            />
-          }
-          label={
-            <Box component="div" fontSize={20}>
-              Normalize data
-            </Box>
-          }
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={mapOutDesiredOutput}
-              sx={{
-                color: "#f2f2f2",
-                "&.Mui-checked": {
-                  color: "#f2f2f2",
-                },
-              }}
-              onClick={handleChangeMapOutDesiredOutput}
-            />
-          }
-          label={
-            <Box component="div" fontSize={ 20 }>
-              Map out labels
-            </Box>
-          }
-        />
+        <CustomCheckbox
+          checked={ normalizeData }
+          onClick={ handleChangeNormalizeData }
+          label={ "Normalize data" }
+        ></CustomCheckbox>
+        <CustomCheckbox
+          checked={ mapOutDesiredOutput }
+          onClick={ handleChangeMapOutDesiredOutput }
+          label={"Map out labels"}
+        ></CustomCheckbox>
+        <CustomCheckbox
+          checked={ splitDataset }
+          onClick={ handleChangeSplitDataset }
+          label={ "Split dataset" }
+        ></CustomCheckbox>
       </FormGroup>
 
       <ColorButton
         variant="contained"
-        disabled={selectedFile ? false : true}
+        disabled={ selectedFile ? false : true }
         onClick={() => {
-          navigate('/dataset-processing',{ state:
-            { normalizeData: normalizeData, mapOutDesiredOutput: mapOutDesiredOutput, file: selectedFile } }
-          );
+          navigate("/dataset-processing", {
+            state: {
+              normalizeData: normalizeData,
+              mapOutDesiredOutput: mapOutDesiredOutput,
+              file: selectedFile,
+              splitDataset: splitDataset,
+            },
+          });
         }}
       >
         Submit

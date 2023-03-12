@@ -16,16 +16,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-data_processing = None
 neural_network_caller = ctypes.CDLL(
             '../model/shared_object/neuralNetworkCaller.so')
+data_processing = DataProcessing(neural_network_caller=neural_network_caller)
 
 @app.post("/split-dataset")
-async def split_dataset(file: UploadFile = File(...), normalize_data: bool = Form(...), map_desired_output: bool = Form(...), ):
+async def split_dataset(file: UploadFile = File(...), normalize_data: bool = Form(...),
+                        map_desired_output: bool = Form(...), split_dataset: bool = Form(...),):
     try:
         dataset = pd.read_csv(file.file)
-        data_processing = DataProcessing(dataset=dataset, neural_network_caller=neural_network_caller)
-        data_processing.start_preprocessing(normalize=normalize_data, map_desired_output=map_desired_output)
+        data_processing.start_preprocessing(dataset=dataset, normalize=normalize_data, map_desired_output=map_desired_output, split_dataset=split_dataset)
     except Exception:
         return {"response": "Error"}
     finally:
@@ -34,9 +34,9 @@ async def split_dataset(file: UploadFile = File(...), normalize_data: bool = For
 
 
 @app.get("/train-dataset")
-async def train_dataset():
+def train_dataset():
     try:
-       data_processing.train_dataset()
+        data_processing.train_dataset()
     except Exception:
         return {"response": "Error"}
     return {"response": "Ok"}
