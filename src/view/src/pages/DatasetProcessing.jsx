@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export const DatasetProcessing = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [response, setResponse] = useState("");
   const [progressText, setProgressText] = useState("Dataset preprocessing...");
 
@@ -38,9 +38,9 @@ export const DatasetProcessing = () => {
       setProgressText("Training dataset, this may take a while...");
       if (response == "trainData") {
         axios.get("http://127.0.0.1:8000/train-dataset").then((results) => {
-          // if (results.data["response"] == "Ok") {
-            
-          // }
+          if(results.data["response"]== "Ok"){
+            navigate("/results");
+          }
         });
       }
     }

@@ -1,6 +1,7 @@
 import sys
 sys.path.append('..')
 from model.data_processing.data_processing import DataProcessing
+from model.data_processing.helpers import read_results_csv_file
 
 import ctypes
 import pandas as pd
@@ -40,3 +41,15 @@ def train_dataset():
     except Exception:
         return {"response": "Error"}
     return {"response": "Ok"}
+
+@app.get("/results")
+def get_results():
+    try:
+        result_data = read_results_csv_file("../model/training_errors/training_errors.csv")
+        data = result_data["sse"]
+        labels = result_data["labels"]
+        seconds = result_data["seconds"]
+        
+    except Exception:
+        return {"response": "Error"}
+    return {"response": "Ok", "data": data, "labels": labels, "seconds": str(seconds) }

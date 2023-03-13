@@ -8,5 +8,5 @@ if test -f "$archivo"; then
 fi
 
 g++ -shared -o shared_object/neuralNetworkCaller.so -fPIC neural_network/NeuralNetworkCaller.cpp
-cd data_processing
-python3 data_processing.py
+# cd data_processing
+# python3 data_processing.py
