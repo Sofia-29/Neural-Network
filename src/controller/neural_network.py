@@ -49,7 +49,7 @@ def get_results():
         data = result_data["sse"]
         labels = result_data["labels"]
         seconds = result_data["seconds"]
-        
+        print(result_data)
     except Exception:
         return {"response": "Error"}
     return {"response": "Ok", "data": data, "labels": labels, "seconds": str(seconds) }
