@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include "Neuron.h"
 
 using namespace std;
 
@@ -12,6 +13,8 @@ public:
 	FileManager();
 	~FileManager();
 
+    void createWeightsFile(vector<Neuron*>*);
+    void readResultsWeightsCSV(vector<vector<float>>*);
 	void saveCSV(const vector<float>);
 };
 
@@ -20,12 +23,14 @@ FileManager::FileManager() {}
 
 FileManager::~FileManager() {}
 
+
+
 void FileManager::saveCSV(const vector<float> trainingErrors)
 {
-	string output_path = "../model/training_errors/training_errors.csv";
+	string output_path = "../model/results_files/training_errors/training_errors.csv";
     ofstream outfile(output_path);
 
-    if (!outfile.is_open()) {
+    if(!outfile.is_open()) {
         cerr << "Error: Could not open file \"" << output_path << "\" for writing." << endl;
         return;
     }
@@ -38,3 +43,50 @@ void FileManager::saveCSV(const vector<float> trainingErrors)
     outfile.close();
 }
 
+void FileManager::createWeightsFile(vector<Neuron*>* neuronLayer){
+    string output_path = "../model/results_files/weights_results/weights.csv";
+    ofstream outfile(output_path);
+
+    if (!outfile.is_open()) {
+        cerr << "Error: Could not open file \"" << output_path << "\" for writing." << endl;
+        return;
+    }
+
+    vector<Neuron*>* neuronLayerAuxiliar = neuronLayer->at(0)->getNextLayer();
+	while (!neuronLayerAuxiliar->empty()) {
+
+		for (int index = 0; index < neuronLayerAuxiliar->size(); index++) {
+			Neuron* neuron = neuronLayerAuxiliar->at(index);
+			stringstream ss(neuron->toString());
+			string weight = "";
+			while (getline(ss, weight, ',')) {
+				outfile << weight << ", ";
+			}
+			outfile << "\n";
+		}
+		neuronLayerAuxiliar = neuronLayerAuxiliar->at(0)->getNextLayer();
+	}
+}
+
+void FileManager::readResultsWeightsCSV(vector<vector<float>>* data){
+    ifstream myFile("../model/results_files/weights_results/weights.csv");
+
+	if (!myFile.is_open()) throw runtime_error("Could not open file");
+
+    string line = "";
+
+
+    while (getline(myFile, line)) {
+        vector<float> input;
+		stringstream ss(line);
+		string token = "";
+        while (getline(ss, token, ',')){
+			if (token == " ") break;
+			float value = stof(token);
+			input.push_back(value);
+		}
+        data->push_back(input);
+    }
+
+    myFile.close();
+}

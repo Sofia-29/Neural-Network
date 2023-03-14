@@ -20,7 +20,7 @@ void runDataTraining(float threshold, float learningRate, int numberOfInputsNeur
     vector<vector<float>> desiredOutputs(size);
     convertToSTLVector(desiredOutputs, desiredOutputsPointer, numberOfOutputNeurons);
 
-    algorithm.startAlgorithm(numberOfInputsNeurons, numberOfOutputNeurons, inputs, desiredOutputs);
+    algorithm.startTraining(numberOfInputsNeurons, numberOfOutputNeurons, inputs, desiredOutputs);
 }
 
 void convertToSTLVector(vector<vector<float>> &stlVector, float **pointerVector, int size)

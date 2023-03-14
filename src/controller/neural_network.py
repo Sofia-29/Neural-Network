@@ -45,7 +45,7 @@ def train_dataset():
 @app.get("/results")
 def get_results():
     try:
-        result_data = read_results_csv_file("../model/training_errors/training_errors.csv")
+        result_data = read_results_csv_file("../model/results_files/training_errors/training_errors.csv")
         data = result_data["sse"]
         labels = result_data["labels"]
         seconds = result_data["seconds"]

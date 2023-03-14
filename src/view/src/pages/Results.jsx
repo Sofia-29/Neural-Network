@@ -28,7 +28,8 @@ export const Results = () => {
             ) : (
                 <>
                     <h1> Model trained in { seconds } seconds </h1>
-                    <LineChart text={"Sum of squared errors in training data"} labels = { labels } data = { data }></LineChart>
+                    <LineChart text={"Sum of squared errors in training data each one thousand iteration"} 
+                                labels = { labels } data = { data }></LineChart>
                 </>
             )   
         }

@@ -11,8 +11,8 @@ export const LineChart = ({ text, labels, data }) => {
         label: 'SSE',
         data: data,
         fill: true,
-        backgroundColor: 'rgba(128, 128, 128, 1)',
-        borderColor: "rgba(255, 255, 255, 0.87)",
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        borderColor: 'rgba(255, 255, 255, 0.87)',
       },
     ],
   };
