@@ -152,6 +152,6 @@ string Neuron::toString()
 	{
 		os << weights[index] << ",";
 	}
-	os << endl << "Bias: " << this->bias;
+	os << this->bias;
 	return os.str();
 }

@@ -42,6 +42,16 @@ def train_dataset():
         return {"response": "Error"}
     return {"response": "Ok"}
 
+@app.get("/test-model")
+def test_model():
+    try:
+        data_processing.test_model()
+    except Exception:
+        return {"response": "Error"}
+    return {"response": "Ok"}
+
+
+
 @app.get("/results")
 def get_results():
     try:

@@ -16,6 +16,7 @@ public:
     void createWeightsFile(vector<Neuron*>*);
     void readResultsWeightsCSV(vector<vector<float>>*);
 	void saveCSV(const vector<float>);
+    void saveResults(const vector<vector<float>>, string);
 };
 
 
@@ -23,11 +24,26 @@ FileManager::FileManager() {}
 
 FileManager::~FileManager() {}
 
+void FileManager::saveResults(const vector<vector<float>> results, string name)
+{
+    string output_path = name;
+    ofstream outfile(output_path);
+    if(!outfile.is_open()) {
+        cerr << "Error: Could not open file \"" << output_path << "\" for writing." << endl;
+        return;
+    }
 
+    for (const auto& row : results) {
+        for (const auto& val: row){
+            outfile << val << ",";
+        }
+        outfile << "\n";
+    }
+}
 
 void FileManager::saveCSV(const vector<float> trainingErrors)
 {
-	string output_path = "../model/results_files/training_errors/training_errors.csv";
+	string output_path = "../results_files/training_errors/training_errors.csv";
     ofstream outfile(output_path);
 
     if(!outfile.is_open()) {
@@ -44,7 +60,7 @@ void FileManager::saveCSV(const vector<float> trainingErrors)
 }
 
 void FileManager::createWeightsFile(vector<Neuron*>* neuronLayer){
-    string output_path = "../model/results_files/weights_results/weights.csv";
+    string output_path = "../results_files/weights/weights.csv";
     ofstream outfile(output_path);
 
     if (!outfile.is_open()) {
@@ -69,7 +85,7 @@ void FileManager::createWeightsFile(vector<Neuron*>* neuronLayer){
 }
 
 void FileManager::readResultsWeightsCSV(vector<vector<float>>* data){
-    ifstream myFile("../model/results_files/weights_results/weights.csv");
+    ifstream myFile("../results_files/weights/weights.csv");
 
 	if (!myFile.is_open()) throw runtime_error("Could not open file");
 

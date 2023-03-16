@@ -39,6 +39,13 @@ export const DatasetProcessing = () => {
       if (response == "trainData") {
         axios.get("http://127.0.0.1:8000/train-dataset").then((results) => {
           if(results.data["response"]== "Ok"){
+            setResponse("testModel");
+          }
+        });
+      } else {
+        setProgressText("Testing model...");
+        axios.get("http://127.0.0.1:8000/test-model").then((results) => {
+          if(results.data["response"]== "Ok"){
             navigate("/results");
           }
         });

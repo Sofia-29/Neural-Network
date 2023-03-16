@@ -20,8 +20,8 @@ public:
 	~Algorithm();
 
 	void startTraining(int, int, vector<vector<float>>, vector<vector<float>>);
-	void testNeuralNetwork(int, int, vector<vector<float>>, vector<vector<float>>);
-	void givePredictions(vector<Neuron *> *, vector<float>, vector<float>);
+	void testNeuralNetwork(string, int, int, vector<vector<float>>, vector<vector<float>>);
+	void givePredictions(vector<Neuron *> *, vector<vector<float>>&, vector<float>);
 	int interpretOutput(float);
 
 	void loadWeights(NeuronLayer *inputLayer);
@@ -107,11 +107,7 @@ void Algorithm::startTraining(int numberOfInputsNeurons, int numberOfOutputNeuro
 		iterations++;
 		accuracy = (float)correct_predictions / (float)dataSize;
 		this->trainingErrors.push_back(sumOfSquaredErrors);
-		// cout << "Sum of squared errors: " << sumOfSquaredErrors << endl;
-		// cout << "Correct predictions: " << correct_predictions << endl;
-		// cout << "Accuracy: " << accuracy << endl;
-		//} while ( accuracy < 0.80 );
-	} while (sumOfSquaredErrors > 0.001 || accuracy < 0.80);
+	} while (sumOfSquaredErrors > 0.001 && accuracy < 0.95);
 
 	instanteFinal = std::chrono::system_clock::now();
 	std::chrono::duration<double> segundos = instanteFinal - instanteInicial;
@@ -123,43 +119,52 @@ void Algorithm::startTraining(int numberOfInputsNeurons, int numberOfOutputNeuro
 	delete outputLayer;
 }
 
-void Algorithm::testNeuralNetwork(int numberOfInputsNeurons, int numberOfOutputNeurons,
+void Algorithm::testNeuralNetwork(string fileName, int numberOfInputsNeurons, int numberOfOutputNeurons,
 								  vector<vector<float>> inputs, vector<vector<float>> desiredOutputs)
 {
 	int dataSize = inputs.size();
 
 	int numberOfHiddenNeurons = numberOfInputsNeurons;
-	int iterations = 0;
-	float accuracy = 0.0;
-	std::chrono::time_point<std::chrono::system_clock> instanteInicial, instanteFinal;
 
+	vector<vector<float>> results;
 	NeuronLayer *inputLayer = new NeuronLayer(numberOfInputsNeurons, "inputLayer", 0);
 	NeuronLayer *hiddenLayer = new NeuronLayer(numberOfHiddenNeurons, "hiddenLayer", numberOfInputsNeurons);
 	NeuronLayer *outputLayer = new NeuronLayer(numberOfOutputNeurons, "outputLayer", numberOfHiddenNeurons);
-
+	inputLayer->connectNeurons(hiddenLayer);
+	hiddenLayer->connectNeurons(outputLayer);
 	loadWeights(inputLayer);
 
 	for (int indexData = 0; indexData < dataSize; indexData++)
 	{
 		this->layerInputs.push_back(inputs[indexData]);
+		givePredictions(hiddenLayer, results, desiredOutputs[indexData]);
 	}
+
+	fileManager->saveResults(results, fileName);
 }
 
-void Algorithm::givePredictions(vector<Neuron *> *neuronLayer, vector<float> input, vector<float> output)
+void Algorithm::givePredictions(vector<Neuron *> *neuronLayer,vector<vector<float>>& results, vector<float> output)
 {
 	while (!neuronLayer->empty())
 	{
 		vector<float> inputNextLayer;
+		vector<float> input = this->layerInputs.back();
+
 		int size = neuronLayer->size();
 		for (int neuronIndex = 0; neuronIndex < size; neuronIndex++)
 		{
 			Neuron *neuron = neuronLayer->at(neuronIndex);
 			float value = neuron->activationFunction(input);
-			inputNextLayer.push_back(value); // The output of a layer is the input of the next layer
+			if (neuron->getRole() == "outputLayer"){
+				int prediction = interpretOutput(value);
+				value = prediction;
+			}
+			inputNextLayer.push_back(value); 
 		}
-		if (neuronLayer->front()->getRole() != "outputLayer")
-		{ // We don't need to store the output of Output layer as input of next layer
-			this->layerInputs.push_back(inputNextLayer);
+		this->layerInputs.erase(this->layerInputs.begin() + this->layerInputs.size() - 1);
+		this->layerInputs.push_back(inputNextLayer);
+		if(neuronLayer->at(0)->getRole() == "outputLayer"){
+			results.push_back(inputNextLayer);
 		}
 		neuronLayer = neuronLayer->at(0)->getNextLayer();
 	}
@@ -171,7 +176,7 @@ void Algorithm::loadWeights(NeuronLayer *inputLayer)
 	vector<vector<float>> *weights = new vector<vector<float>>();
 	fileManager->readResultsWeightsCSV(weights);
 	int weightIndex = 0;
-	while (!neuronLayer->empty())
+	do 
 	{
 		for (int index = 0; index < neuronLayer->size(); index++)
 		{
@@ -184,7 +189,7 @@ void Algorithm::loadWeights(NeuronLayer *inputLayer)
 			weightIndex++;
 		}
 		neuronLayer = neuronLayer->at(0)->getNextLayer();
-	}
+	} while(!neuronLayer->empty());
 }
 
 void Algorithm::feedForward(vector<Neuron *> *neuronLayer)
