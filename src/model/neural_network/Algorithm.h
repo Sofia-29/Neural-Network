@@ -107,7 +107,7 @@ void Algorithm::startTraining(int numberOfInputsNeurons, int numberOfOutputNeuro
 		iterations++;
 		accuracy = (float)correct_predictions / (float)dataSize;
 		this->trainingErrors.push_back(sumOfSquaredErrors);
-	} while (sumOfSquaredErrors > 0.001 && accuracy < 0.95);
+	} while (sumOfSquaredErrors > 0.001 || accuracy < 0.95);
 
 	instanteFinal = std::chrono::system_clock::now();
 	std::chrono::duration<double> segundos = instanteFinal - instanteInicial;
